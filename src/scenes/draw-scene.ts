@@ -14,6 +14,7 @@ export class DrawScene extends Phaser.Scene {
   private cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
   private bg: Phaser.GameObjects.Image;
   private image: Phaser.Physics.Arcade.Sprite;
+  private cat: Phaser.Physics.Arcade.Sprite;
   private rt: Phaser.GameObjects.RenderTexture;
   private timer: Phaser.Time.TimerEvent;
   private text: Phaser.GameObjects.Text;
@@ -33,6 +34,11 @@ export class DrawScene extends Phaser.Scene {
 
     this.bg.displayWidth = this.sys.canvas.width;
     this.bg.displayHeight = this.sys.canvas.height;
+
+    // create cat
+    this.cat = this.physics.add.sprite(screen_center.x, getGameHeight(this), 'cat').setOrigin(0.5, 0.5);
+    this.cat.scale = 0.2;
+    this.cat.setPosition(screen_center.x / 2, getGameHeight(this) - (this.cat.height * this.cat.scaleY) / 2);
 
     // create a 10 second timer
     this.timer = this.time.addEvent({
