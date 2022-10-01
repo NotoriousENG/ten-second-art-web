@@ -42,7 +42,10 @@ export class DrawScene extends Phaser.Scene {
     // This is a nice helper Phaser provides to create listeners for some of the most common keys.
     this.cursorKeys = this.input.keyboard.createCursorKeys();
 
-    this.rt = this.add.renderTexture(0, 0, 800, 600);
+    // get the center position of the screen
+    const center = new Phaser.Math.Vector2(getGameWidth(this) / 2, getGameHeight(this) / 2);
+
+    this.rt = this.add.renderTexture(center.x, center.y, 600, 400).setOrigin(0.5, 0.5);
     // set render texture color to white
     this.rt.fill(0xffffff);
 
@@ -54,15 +57,23 @@ export class DrawScene extends Phaser.Scene {
     this.image.scale = this.brushScale;
 
     this.input.on('pointermove', (pointer: Input.Pointer) => {
+      // convert pointer position to render texture position, accounting for the render texture origin
+      const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
+        new Phaser.Math.Vector2(
+          this.rt.x - this.rt.width * this.rt.originX,
+          this.rt.y - this.rt.height * this.rt.originY,
+        ),
+      );
+
       if (pointer.isDown) {
         // draw a line from the last pointer position to the current pointer position fill in gaps dynamically
-        getLinePoints(this.lastPointerPosition, pointer.position, (this.image.width * this.brushScale) / 4).forEach(
+        getLinePoints(this.lastPointerPosition, pointerPosition, (this.image.width * this.brushScale) / 4).forEach(
           (point) => {
             this.rt.draw(this.image, point.x, point.y);
           },
         );
       }
-      this.lastPointerPosition.copy(pointer.position);
+      this.lastPointerPosition.copy(pointerPosition);
     });
 
     // set image scale when using bracket keys
