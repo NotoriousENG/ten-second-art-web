@@ -12,6 +12,7 @@ export class DrawScene extends Phaser.Scene {
   public speed = 200;
 
   private cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
+  private bg: Phaser.GameObjects.Image;
   private image: Phaser.Physics.Arcade.Sprite;
   private rt: Phaser.GameObjects.RenderTexture;
   private timer: Phaser.Time.TimerEvent;
@@ -24,6 +25,15 @@ export class DrawScene extends Phaser.Scene {
   }
 
   public create(): void {
+    // get the center position of the screen
+    const screen_center = new Phaser.Math.Vector2(getGameWidth(this) / 2, getGameHeight(this) / 2);
+
+    // create background
+    this.bg = this.add.image(screen_center.x, screen_center.y, 'bg').setOrigin(0.5, 0.5);
+
+    this.bg.displayWidth = this.sys.canvas.width;
+    this.bg.displayHeight = this.sys.canvas.height;
+
     // create a 10 second timer
     this.timer = this.time.addEvent({
       delay: 10000,
@@ -42,10 +52,7 @@ export class DrawScene extends Phaser.Scene {
     // This is a nice helper Phaser provides to create listeners for some of the most common keys.
     this.cursorKeys = this.input.keyboard.createCursorKeys();
 
-    // get the center position of the screen
-    const center = new Phaser.Math.Vector2(getGameWidth(this) / 2, getGameHeight(this) / 2);
-
-    this.rt = this.add.renderTexture(center.x, center.y, 600, 400).setOrigin(0.5, 0.5);
+    this.rt = this.add.renderTexture(screen_center.x, screen_center.y, 600, 400).setOrigin(0.5, 0.5);
     // set render texture color to white
     this.rt.fill(0xffffff);
 
