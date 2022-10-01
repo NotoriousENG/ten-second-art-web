@@ -89,6 +89,19 @@ export class DrawScene extends Phaser.Scene {
       this.lastPointerPosition.copy(pointerPosition);
     });
 
+    // if we click, draw a dot
+    this.input.on('pointerdown', (pointer: Input.Pointer) => {
+      const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
+        new Phaser.Math.Vector2(
+          this.rt.x - this.rt.width * this.rt.originX,
+          this.rt.y - this.rt.height * this.rt.originY,
+        ),
+      );
+      if (pointer.isDown) {
+        this.rt.draw(this.image, pointerPosition.x, pointerPosition.y);
+      }
+    });
+
     // set image scale when using bracket keys
     this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
       if (event.key === '[') {
