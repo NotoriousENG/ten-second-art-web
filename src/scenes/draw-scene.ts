@@ -59,6 +59,7 @@ export class DrawScene extends Phaser.Scene {
     this.gifEncoder = new GIFEncoder(800, 600);
     this.gifEncoder.setRepeat(1);
     this.gifEncoder.setDelay(20);
+    this.gifEncoder.start();
 
     // set render texture color to white
     this.rt.fill(0xffffff);
@@ -113,11 +114,28 @@ export class DrawScene extends Phaser.Scene {
       this.gifEncoder.addFrame(this.rt.canvas.getContext('2d'));
       console.log(this.gifEncoder.frames);
       this.frames++;
-      if (this.frames == 1) {
+      if (this.frames == 5) {
         this.gifEncoder.finish();
-        const base64: string = this.gifEncoder.out.getData().toString('base64');
-        (document.getElementById('my-img') as HTMLImageElement).src = 'data:image/gif;base64,' + base64;
+        const buffer = this.gifEncoder.out.getData().buffer;
+        this.downloadObject(buffer, 'movie.gif');
+        this.gifEncoder = null;
       }
     }
+  }
+
+  // https://stackoverflow.com/a/47821215
+  private downloadObject(obj, filename) {
+    const blob = new Blob([obj], { type: 'image/gif' });
+    const url = URL.createObjectURL(blob);
+    const elem = document.createElement('a');
+    elem.href = url;
+    elem.download = filename;
+    document.body.appendChild(elem);
+    elem.click();
+    document.body.removeChild(elem);
+    
+    // (document.getElementById('my-img') as HTMLImageElement).src = URL.createObjectURL(
+    //   new Blob([obj.buffer], { type: 'image/gif' } /* (1) */),
+    // );
   }
 }
