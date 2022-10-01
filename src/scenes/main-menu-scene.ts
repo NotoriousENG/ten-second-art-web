@@ -22,7 +22,7 @@ export class MainMenuScene extends Phaser.Scene {
       .setFontSize(24);
 
     new MenuButton(this, 100, 150, 'Start Game', () => {
-      this.scene.start('Game');
+      this.scene.start('Cat');
     });
 
     new MenuButton(this, 100, 250, 'Settings', () => console.log('settings button clicked'));

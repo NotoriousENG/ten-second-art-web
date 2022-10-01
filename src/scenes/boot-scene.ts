@@ -74,5 +74,6 @@ export class BootScene extends Phaser.Scene {
 
     // Source: Open Game Art
     this.load.image('man', 'assets/sprites/character.png');
+    this.load.image('cat', 'assets/sprites/cat-900x900.png');
   }
 }
