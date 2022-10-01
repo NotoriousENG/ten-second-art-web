@@ -74,6 +74,15 @@ export class DrawScene extends Phaser.Scene {
       }
       this.image.scale = this.brushScale;
     });
+
+    // set opacity of image when using - and = keys
+    this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
+      if (event.key === '-') {
+        this.image.alpha = Math.max(this.image.alpha - 0.05, 0.1);
+      } else if (event.key === '=') {
+        this.image.alpha = Math.min(this.image.alpha + 0.05, 1);
+      }
+    });
   }
 
   public update(): void {
