@@ -1,6 +1,7 @@
 import { Input } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
 import { getLinePoints } from '../utils/drawing';
+import GIFEncoder = require('gif-encoder-2-browser');
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -18,6 +19,8 @@ export class DrawScene extends Phaser.Scene {
   private text: Phaser.GameObjects.Text;
   private lastPointerPosition: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0);
   private brushScale = 1;
+  private gifEncoder: GIFEncoder = null;
+  private frames = 0;
 
   constructor() {
     super(sceneConfig);
@@ -33,6 +36,15 @@ export class DrawScene extends Phaser.Scene {
       loop: true,
     });
 
+    // create a 0.2s timer for gifmaking
+    this.timer = this.time.addEvent({
+      delay: 200,
+      callback: () => {
+        this.addGifFrame();
+      },
+      loop: true,
+    });
+
     // add text to display the timer
     this.text = this.add.text(400, 300, 'Hello World', {
       fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
@@ -43,6 +55,11 @@ export class DrawScene extends Phaser.Scene {
     this.cursorKeys = this.input.keyboard.createCursorKeys();
 
     this.rt = this.add.renderTexture(0, 0, 800, 600);
+
+    this.gifEncoder = new GIFEncoder(800, 600);
+    this.gifEncoder.setRepeat(1);
+    this.gifEncoder.setDelay(20);
+
     // set render texture color to white
     this.rt.fill(0xffffff);
 
@@ -89,5 +106,18 @@ export class DrawScene extends Phaser.Scene {
     // set image position to mouse pointer
     this.image.setPosition(this.input.activePointer.x, this.input.activePointer.y);
     //this.image.setPosition(normalizedVelocity.x * this.speed, normalizedVelocity.y * this.speed);
+  }
+
+  private addGifFrame(): void {
+    if (this.gifEncoder != null) {
+      this.gifEncoder.addFrame(this.rt.canvas.getContext('2d'));
+      console.log(this.gifEncoder.frames);
+      this.frames++;
+      if (this.frames == 1) {
+        this.gifEncoder.finish();
+        const base64: string = this.gifEncoder.out.getData().toString('base64');
+        (document.getElementById('my-img') as HTMLImageElement).src = 'data:image/gif;base64,' + base64;
+      }
+    }
   }
 }
