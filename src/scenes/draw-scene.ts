@@ -27,6 +27,7 @@ export class DrawScene extends Phaser.Scene {
       callback: () => {
         this.image.setTint(Math.random() * 0xffffff);
       },
+      loop: true,
     });
 
     // add text to display the timer
