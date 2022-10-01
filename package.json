@@ -10,11 +10,12 @@
     "build": "yarn build:dev",
     "build:dev": "NODE_ENV=development webpack",
     "build:prod": "NODE_ENV=production webpack",
-    "dev": "NODE_ENV=development webpack-dev-server",
-    "prod": "NODE_ENV=production webpack-dev-server",
-    "lint": "eslint src"
+    "dev": "yarn lint && NODE_ENV=development webpack-dev-server",
+    "prod": "yarn lint && NODE_ENV=production webpack-dev-server",
+    "lint": "eslint --fix src"
   },
   "dependencies": {
+    "color": "^4.2.3",
     "phaser": "^3.50.0"
   },
   "devDependencies": {

@@ -1,5 +1,6 @@
 import { Input } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
+import { getLinePoints } from '../utils/drawing';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -15,6 +16,7 @@ export class DrawScene extends Phaser.Scene {
   private rt: Phaser.GameObjects.RenderTexture;
   private timer: Phaser.Time.TimerEvent;
   private text: Phaser.GameObjects.Text;
+  private lastPointerPosition: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0);
 
   constructor() {
     super(sceneConfig);
@@ -50,8 +52,12 @@ export class DrawScene extends Phaser.Scene {
 
     this.input.on('pointermove', (pointer: Input.Pointer) => {
       if (pointer.isDown) {
-        this.rt.draw(this.image, pointer.x, pointer.y);
+        // draw a line from the last pointer position to the current pointer position fill in gaps dynamically
+        getLinePoints(this.lastPointerPosition, pointer.position, this.image.width / 4).forEach((point) => {
+          this.rt.draw(this.image, point.x, point.y);
+        });
       }
+      this.lastPointerPosition.copy(pointer.position);
     });
   }
 
