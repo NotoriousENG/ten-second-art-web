@@ -1,4 +1,4 @@
-import { Input } from 'phaser';
+import { Input, Physics } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
 import { getLinePoints } from '../utils/drawing';
 import { NUM_BRUSHES } from '../constants';
@@ -16,8 +16,11 @@ export class DrawScene extends Phaser.Scene {
   private bg: Phaser.GameObjects.Image;
   private image: Phaser.Physics.Arcade.Sprite;
   private cat: Phaser.Physics.Arcade.Sprite;
-  private brush: Phaser.Physics.Arcade.Sprite;
   private splat: Phaser.Physics.Arcade.Sprite;
+  private easel: Phaser.Physics.Arcade.Sprite;
+  private water: Phaser.Physics.Arcade.Sprite;
+  private waterGlow: Phaser.Physics.Arcade.Sprite;
+  private easelGroup: Phaser.Physics.Arcade.Group;
   private rt: Phaser.GameObjects.RenderTexture;
   private timer: Phaser.Time.TimerEvent;
   private text: Phaser.GameObjects.Text;
@@ -70,12 +73,20 @@ export class DrawScene extends Phaser.Scene {
     // This is a nice helper Phaser provides to create listeners for some of the most common keys.
     this.cursorKeys = this.input.keyboard.createCursorKeys();
 
+    // setup easel
+    this.easelGroup = this.physics.add.group();
+    this.easel = this.easelGroup.create(0, 0, 'easel') as Physics.Arcade.Sprite;
+    this.water = this.easelGroup.create(0, 0, 'water');
+    this.waterGlow = this.easelGroup.create(0, 0, 'waterGlow');
+    this.easelGroup.scaleXY(-0.55, -0.55);
+    this.easelGroup.setXY(screen_center.x + 120, screen_center.y + 65);
+
     this.rt = this.add.renderTexture(screen_center.x, screen_center.y, 600, 400).setOrigin(0.5, 0.5);
     // set render texture color to white
     this.rt.fill(0xffffff);
 
     // Add a virtual brush, moves with mouse
-    this.image = this.physics.add.sprite(getGameWidth(this) / 2, getGameHeight(this) / 2, `brush${this.selectedBrush}`);
+    this.image = this.physics.add.sprite(screen_center.x, screen_center.y, `brush${this.selectedBrush}`);
     // set image color to black
     this.image.setTint(0x000000);
 
