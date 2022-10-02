@@ -137,7 +137,7 @@ export class DrawScene extends Phaser.Scene {
         ((water.b * 3 + Math.min(water.b, brush.b) * 2 + brush.b) / 6);
       this.water.setTint(this.water_color);
     });
-    this.smallBrush.setInteractive({ pixelPerfect: true, useHandCursor: true });
+    this.smallBrush.setInteractive({ useHandCursor: true });
     this.smallBrush.on('pointermove', () => {
       this.smallBrushGlow.visible = true;
     });
@@ -148,7 +148,7 @@ export class DrawScene extends Phaser.Scene {
       this.brushScale = Math.max(this.brushScale - 0.1, 0.1);
       this.image.scale = this.brushScale;
     });
-    this.largeBrush.setInteractive({ pixelPerfect: true, useHandCursor: true });
+    this.largeBrush.setInteractive({ useHandCursor: true });
     this.largeBrush.on('pointermove', () => {
       this.largeBrushGlow.visible = true;
     });
