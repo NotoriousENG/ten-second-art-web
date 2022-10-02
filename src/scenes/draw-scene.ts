@@ -31,6 +31,8 @@ export class DrawScene extends Phaser.Scene {
   private selectedBrush = 0;
   private leftUI: Phaser.GameObjects.Image;
   private buttons: Phaser.Physics.Arcade.Sprite[] = [];
+  private dirty = false;
+  private opacity = 1;
 
   constructor() {
     super(sceneConfig);
@@ -56,6 +58,7 @@ export class DrawScene extends Phaser.Scene {
     this.splat.on('pointerdown', () => {
       this.image.setTint(this.palette_color);
       this.buttons[this.selectedBrush].setTint(this.palette_color);
+      this.setOpacity(1);
       if (!this.drawing) {
         // make sure ui is visible
         this.image.visible = true;
@@ -69,7 +72,7 @@ export class DrawScene extends Phaser.Scene {
         this.start_drawing();
       }
     });
-    this.splat.setInteractive({ pixelPerfect: true });
+    this.splat.setInteractive({ pixelPerfect: true, useHandCursor: true });
     this.splat.setTint(this.palette_color);
 
     // setup easel
@@ -77,8 +80,19 @@ export class DrawScene extends Phaser.Scene {
     this.easel = this.easelGroup.create(0, 0, 'easel') as Physics.Arcade.Sprite;
     this.water = this.easelGroup.create(0, 0, 'water');
     this.waterGlow = this.easelGroup.create(0, 0, 'waterGlow');
+    this.waterGlow.visible = false;
     this.easelGroup.scaleXY(-0.55, -0.55);
     this.easelGroup.setXY(screen_center.x + 120, screen_center.y + 65);
+    this.water.setInteractive({ pixelPerfect: true, useHandCursor: true });
+    this.water.on('pointermove', () => {
+      this.waterGlow.visible = true;
+    });
+    this.water.on('pointerout', () => {
+      this.waterGlow.visible = false;
+    });
+    this.water.on('pointerdown', () => {
+      this.setOpacity(Math.max(this.opacity - 0.2, 0.1));
+    });
 
     this.rt = this.add.renderTexture(screen_center.x, screen_center.y, 600, 400).setOrigin(0.5, 0.5);
     // set render texture color to white
@@ -92,6 +106,17 @@ export class DrawScene extends Phaser.Scene {
 
     this.image.scale = this.brushScale;
 
+    this.timer = this.time.addEvent({
+      delay: 10,
+      callback: () => {
+        if (this.dirty) {
+          this.setOpacity(this.opacity - 0.002);
+          this.dirty = false;
+        }
+      },
+      loop: true,
+    });
+
     this.input.on('pointermove', (pointer: Input.Pointer) => {
       // convert pointer position to render texture position, accounting for the render texture origin
       const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
@@ -102,6 +127,7 @@ export class DrawScene extends Phaser.Scene {
       );
 
       if (pointer.isDown && this.drawing) {
+        this.dirty = true;
         // draw a line from the last pointer position to the current pointer position fill in gaps dynamically
         getLinePoints(this.lastPointerPosition, pointerPosition, (this.image.width * this.brushScale) / 4).forEach(
           (point) => {
@@ -153,6 +179,7 @@ export class DrawScene extends Phaser.Scene {
       );
       if (pointer.isDown && this.drawing) {
         this.rt.draw(this.image, pointerPosition.x, pointerPosition.y);
+        this.dirty = true;
       }
     });
 
@@ -169,9 +196,9 @@ export class DrawScene extends Phaser.Scene {
     // set opacity of image when using - and = keys
     this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
       if (event.key === '-') {
-        this.image.alpha = Math.max(this.image.alpha - 0.05, 0.1);
+        this.setOpacity(Math.max(this.opacity - 0.05, 0.1));
       } else if (event.key === '=') {
-        this.image.alpha = Math.min(this.image.alpha + 0.05, 1);
+        this.setOpacity(Math.min(this.opacity + 0.05, 1));
       }
     });
 
@@ -223,5 +250,10 @@ export class DrawScene extends Phaser.Scene {
     }
     this.selectedBrush = desiredBrush % NUM_BRUSHES;
     this.image.setTexture(`brush${this.selectedBrush}`);
+  }
+
+  private setOpacity(opacity: number) {
+    this.opacity = opacity;
+    this.image.alpha = Math.pow(opacity, 6);
   }
 }
