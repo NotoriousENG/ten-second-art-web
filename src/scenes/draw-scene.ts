@@ -446,13 +446,14 @@ export class DrawScene extends Phaser.Scene {
     this.timer = this.time.addEvent({
       delay: 10000,
       callback: () => {
-        if (this.colors_used < 6) {
+        if (this.colors_used < 5) {
           this.colors_used++;
           const new_color = getRandomColor();
           this.palette_color = new_color;
           this.palatte_list.push(new_color);
           this.splat.setTint(this.palette_color);
         } else {
+          this.togglePaw(true);
           this.splat.visible = false;
           this.timer = this.time.addEvent({
             delay: 2000,
@@ -467,12 +468,6 @@ export class DrawScene extends Phaser.Scene {
       loop: true,
     });
 
-    this.timer60 = this.time.addEvent({
-      delay: 60000,
-      callback: () => {
-        this.togglePaw(true);
-      },
-    });
     this.drawing = true;
   }
 
