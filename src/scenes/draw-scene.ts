@@ -1,7 +1,7 @@
 import { Input, Physics, Display } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
 import { getLinePoints, getRandomColor } from '../utils/drawing';
-import { NUM_BRUSHES, NUM_TRACKS } from '../constants';
+import { NUM_BRUSHES, NUM_PAW_PIECES, NUM_TRACKS } from '../constants';
 
 const Color = Display.Color;
 
@@ -59,6 +59,8 @@ export class DrawScene extends Phaser.Scene {
   private music_tracks: Phaser.Sound.BaseSound[] = [];
   private musicButtons: Phaser.Physics.Arcade.Sprite[] = [];
   private selectedMusic = 0;
+  private pawPieces: Phaser.Physics.Arcade.Sprite[] = [];
+  timer60: Phaser.Time.TimerEvent;
 
   constructor() {
     super(sceneConfig);
@@ -326,6 +328,28 @@ export class DrawScene extends Phaser.Scene {
     });
     this.download.on('pointerout', () => {
       this.downloadGlow.visible = false;
+    // add paw pieces
+    for (let i = 0; i < NUM_PAW_PIECES; i++) {
+      const pawPieceSize = icon_size;
+      this.pawPieces.push(this.physics.add.sprite(screen_center.x + 220, screen_center.y + 160, `paw${i}`));
+      this.pawPieces[i].setOrigin(0.5, 0.5);
+      this.pawPieces[i].scale = pawPieceSize / 512;
+      this.pawPieces[i].setTint(0xffffff);
+    }
+    this.togglePaw(false);
+
+    // if we click, draw a dot
+    this.input.on('pointerdown', (pointer: Input.Pointer) => {
+      const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
+        new Phaser.Math.Vector2(
+          this.rt.x - this.rt.width * this.rt.originX,
+          this.rt.y - this.rt.height * this.rt.originY,
+        ),
+      );
+      if (pointer.isDown && this.drawing) {
+        this.rt.draw(this.image, pointerPosition.x, pointerPosition.y);
+        this.dirty = true;
+      }
     });
     this.download.on('pointerdown', () => {
       // this.fade.visible = true;
@@ -441,6 +465,13 @@ export class DrawScene extends Phaser.Scene {
       },
       loop: true,
     });
+
+    this.timer60 = this.time.addEvent({
+      delay: 60000,
+      callback: () => {
+        this.togglePaw(true);
+      },
+    });
     this.drawing = true;
   }
 
@@ -467,5 +498,14 @@ export class DrawScene extends Phaser.Scene {
   private setOpacity(opacity: number) {
     this.opacity = opacity;
     this.image.alpha = Math.pow(opacity, 8);
+  }
+
+  private togglePaw(active) {
+    this.pawPieces.forEach((pawPiece, index) => {
+      if (active) {
+        pawPiece.setTint(this.palatte_list[index]);
+      }
+      pawPiece.setVisible(active);
+    });
   }
 }
