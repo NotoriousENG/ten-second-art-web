@@ -1,7 +1,7 @@
 import { Input, Physics, Display } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
 import { getLinePoints, getRandomColor } from '../utils/drawing';
-import { NUM_BRUSHES } from '../constants';
+import { NUM_BRUSHES, NUM_TRACKS } from '../constants';
 
 const Color = Display.Color;
 
@@ -42,7 +42,9 @@ export class DrawScene extends Phaser.Scene {
   private buttons: Phaser.Physics.Arcade.Sprite[] = [];
   private dirty = false;
   private opacity = 1;
-  private music: Phaser.Sound.BaseSound;
+  private music_tracks: Phaser.Sound.BaseSound[] = [];
+  private musicButtons: Phaser.Physics.Arcade.Sprite[] = [];
+  private selectedMusic = 0;
 
   constructor() {
     super(sceneConfig);
@@ -50,8 +52,10 @@ export class DrawScene extends Phaser.Scene {
 
   public create(): void {
     // add looping music to the scene
-    this.music = this.sound.add('track0', { loop: true });
-    this.music.play();
+    for (let i = 0; i < NUM_TRACKS; i++) {
+      this.music_tracks.push(this.sound.add(`track${i}`, { loop: true }));
+    }
+    this.music_tracks[this.selectedMusic].play();
 
     // get the center position of the screen
     const screen_center = new Phaser.Math.Vector2(getGameWidth(this) / 2, getGameHeight(this) / 2);
@@ -236,6 +240,37 @@ export class DrawScene extends Phaser.Scene {
       this.buttons[i].visible = false; // not visible until we can draw
     }
 
+    // add three music icons at the top right of the screen alligned vertically
+    for (let i = 0; i < NUM_TRACKS; i++) {
+      const musicIconSize = icon_size * 2;
+      this.musicButtons.push(
+        this.physics.add.sprite(
+          getGameWidth(this) - musicIconSize,
+          musicIconSize + i * musicIconSize + i * icon_padding,
+          'musicIcon',
+        ),
+      );
+      this.musicButtons[i].setOrigin(0.5, 0.5);
+      this.musicButtons[i].scale = musicIconSize / 256;
+      this.musicButtons[i].setTint(0xffffff);
+      this.musicButtons[i].setInteractive({});
+      this.musicButtons[i].on('pointerdown', (pointer: Input.Pointer) => {
+        if (pointer.isDown) {
+          console.log('music changed to: ' + i);
+          this.musicButtons[this.selectedMusic].setTint(0xffffff);
+          this.changeMusic(i);
+          // get color calculated based on index and number of tracks
+          const color = Color.HSVToRGB(i / NUM_TRACKS, 1, 1) as Phaser.Types.Display.ColorObject;
+          // convert rgb to number
+          const colorInt = (color.r << 16) | (color.g << 8) | color.b;
+
+          // rgb to integer
+          this.musicButtons[this.selectedMusic].setTint(colorInt);
+        }
+      });
+    }
+    this.musicButtons[this.selectedMusic].setTint(0xff0000);
+
     // if we click, draw a dot
     this.input.on('pointerdown', (pointer: Input.Pointer) => {
       const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
@@ -317,6 +352,15 @@ export class DrawScene extends Phaser.Scene {
     }
     this.selectedBrush = desiredBrush % NUM_BRUSHES;
     this.image.setTexture(`brush${this.selectedBrush}`);
+  }
+
+  private changeMusic(i: number) {
+    this.music_tracks[this.selectedMusic].stop();
+    if (i < 0) {
+      i = NUM_TRACKS + i;
+    }
+    this.selectedMusic = i % NUM_TRACKS;
+    this.music_tracks[this.selectedMusic].play();
   }
 
   private setOpacity(opacity: number) {
