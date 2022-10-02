@@ -5,7 +5,7 @@ export function getLinePoints(p1: Phaser.Math.Vector2, p2: Phaser.Math.Vector2, 
   let delta = p2.clone().subtract(p1);
   const length = delta.length();
   if (length === 0) {
-    console.log('length is 0');
+    // console.log('length is 0');
     return points;
   }
   delta = delta.clone().scale(1 / length);
@@ -13,7 +13,7 @@ export function getLinePoints(p1: Phaser.Math.Vector2, p2: Phaser.Math.Vector2, 
     points.push(p1.clone().add(delta.clone().scale(i)));
   }
 
-  console.log(JSON.stringify(points));
+  // console.log(JSON.stringify(points));
 
   return points;
 }
