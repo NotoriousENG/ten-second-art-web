@@ -1,3 +1,8 @@
+## Fix `ERR_OSSL_EVP_UNSUPPORTED` for Powershell
+```ps
+$env:NODE_OPTIONS="--openssl-legacy-provider"
+```
+
 # Phaser 3 + TypeScript Starter Kit
 
 This repository contains all the code necessary to start making a game in Phaser 3 using TypeScript.

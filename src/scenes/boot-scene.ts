@@ -76,7 +76,7 @@ export class BootScene extends Phaser.Scene {
     // Source: Open Game Art
     this.load.image('man', 'assets/sprites/character.png');
     this.load.image('cat', 'assets/sprites/cat-900x900.png');
-    this.load.image('bg', 'assets/sprites/test_bg.jpg');
+    this.load.image('bg', 'assets/sprites/background.png');
     this.load.image('splat', 'assets/sprites/splat.jpg');
     this.load.image('easel', 'assets/sprites/easelPaper.png');
     this.load.image('water', 'assets/sprites/water.png');
@@ -85,5 +85,11 @@ export class BootScene extends Phaser.Scene {
     for (let i = 0; i < NUM_BRUSHES; i++) {
       this.load.image(`brush${i}`, `assets/sprites/brushes/${i}.png`);
     }
+
+    // load music
+    this.load.audio('track0', 'assets/music/two_left_socks.ogg');
+    this.load.audio('track1', 'assets/music/rainy_village_8_bit_lofi.mp3');
+    this.load.audio('track2', 'assets/music/SummerChallenge.mp3');
+    this.load.audio('track3', 'assets/music/Fingersnap bar.mp3');
   }
 }
