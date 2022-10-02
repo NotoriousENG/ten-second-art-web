@@ -315,13 +315,12 @@ export class DrawScene extends Phaser.Scene {
 
     this.download = this.physics.add
       .sprite(screen_center.x, screen_center.y - 350, 'download')
-      .setOrigin(0.5, 0.5)
       .setScale(0.25, 0.25);
     this.downloadGlow = this.physics.add
-      .sprite(screen_center.x, screen_center.y - 350, 'dowloadGlow')
-      .setOrigin(0.5, 0.5)
+      .sprite(screen_center.x, screen_center.y - 350, 'downloadGlow')
       .setScale(0.25, 0.25);
     this.download.visible = false;
+    this.downloadGlow.visible = false;
     this.download.on('pointermove', () => {
       this.downloadGlow.visible = true;
     });
@@ -447,7 +446,7 @@ export class DrawScene extends Phaser.Scene {
     this.timer = this.time.addEvent({
       delay: 10000,
       callback: () => {
-        if (this.colors_used < 1) {
+        if (this.colors_used < 6) {
           this.colors_used++;
           const new_color = getRandomColor();
           this.palette_color = new_color;
