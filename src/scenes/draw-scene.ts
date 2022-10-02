@@ -16,7 +16,9 @@ export class DrawScene extends Phaser.Scene {
   private bg: Phaser.GameObjects.Image;
   private image: Phaser.Physics.Arcade.Sprite;
   private cat: Phaser.Physics.Arcade.Sprite;
+  private palette: Phaser.Physics.Arcade.Sprite;
   private splat: Phaser.Physics.Arcade.Sprite;
+  private splatGlow: Phaser.Physics.Arcade.Sprite;
   private easel: Phaser.Physics.Arcade.Sprite;
   private water: Phaser.Physics.Arcade.Sprite;
   private waterGlow: Phaser.Physics.Arcade.Sprite;
@@ -63,30 +65,6 @@ export class DrawScene extends Phaser.Scene {
     this.cat = this.physics.add.sprite(screen_center.x, getGameHeight(this), 'cat').setOrigin(0.5, 0.5);
     this.cat.scale = 0.2;
     this.cat.setPosition(screen_center.x / 2, getGameHeight(this) - (this.cat.height * this.cat.scaleY) / 2);
-
-    // add debug palatte
-    this.splat = this.physics.add.sprite(100, 100, 'splat').setOrigin(0.5, 0.5);
-    this.splat.scale = 0.2;
-    this.splat.on('pointerdown', () => {
-      this.brush_color = this.palette_color;
-      this.image.setTint(this.palette_color);
-      this.buttons[this.selectedBrush].setTint(this.palette_color);
-      this.setOpacity(1);
-      if (!this.drawing) {
-        // make sure ui is visible
-        this.image.visible = true;
-        this.leftUI.visible = true;
-        this.buttons.forEach((button) => {
-          button.visible = true;
-          // set ui as interactive
-          button.setInteractive({ useHandCursor: true });
-        });
-
-        this.start_drawing();
-      }
-    });
-    this.splat.setInteractive({ pixelPerfect: true, useHandCursor: true });
-    this.splat.setTint(this.palette_color);
 
     // setup easel
     this.easelGroup = this.physics.add.group();
@@ -147,6 +125,45 @@ export class DrawScene extends Phaser.Scene {
     this.rt = this.add.renderTexture(screen_center.x, screen_center.y, 600, 400).setOrigin(0.5, 0.5);
     // set render texture color to white
     this.rt.fill(0xffffff);
+
+    // create palette
+    this.palette = this.physics.add
+      .sprite(screen_center.x - 550, screen_center.y + 250, 'palette')
+      .setScale(0.16, 0.16)
+      .setRotation(3.3);
+    this.splat = this.physics.add.sprite(screen_center.x - 480, screen_center.y + 200, 'splat').setOrigin(0.5, 0.5);
+    this.splatGlow = this.physics.add
+      .sprite(screen_center.x - 480, screen_center.y + 200, 'splatGlow')
+      .setOrigin(0.5, 0.5);
+    this.splatGlow.visible = false;
+    this.splatGlow.scale = 0.3;
+    this.splat.scale = 0.3;
+    this.splat.on('pointermove', () => {
+      this.splatGlow.visible = true;
+    });
+    this.splat.on('pointerout', () => {
+      this.splatGlow.visible = false;
+    });
+    this.splat.on('pointerdown', () => {
+      this.brush_color = this.palette_color;
+      this.image.setTint(this.palette_color);
+      this.buttons[this.selectedBrush].setTint(this.palette_color);
+      this.setOpacity(1);
+      if (!this.drawing) {
+        // make sure ui is visible
+        this.image.visible = true;
+        this.leftUI.visible = true;
+        this.buttons.forEach((button) => {
+          button.visible = true;
+          // set ui as interactive
+          button.setInteractive({ useHandCursor: true });
+        });
+
+        this.start_drawing();
+      }
+    });
+    this.splat.setInteractive({ pixelPerfect: true, useHandCursor: true });
+    this.splat.setTint(this.palette_color);
 
     // Add a virtual brush, moves with mouse
     this.image = this.physics.add.sprite(screen_center.x, screen_center.y, `brush${this.selectedBrush}`);

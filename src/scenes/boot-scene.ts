@@ -77,7 +77,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image('man', 'assets/sprites/character.png');
     this.load.image('cat', 'assets/sprites/cat-900x900.png');
     this.load.image('bg', 'assets/sprites/background.png');
-    this.load.image('splat', 'assets/sprites/splat.jpg');
+    this.load.image('splat', 'assets/sprites/splat.png');
     this.load.image('easel', 'assets/sprites/easelPaper.png');
     this.load.image('water', 'assets/sprites/water.png');
     this.load.image('waterGlow', 'assets/sprites/glow.png');
@@ -85,6 +85,8 @@ export class BootScene extends Phaser.Scene {
     this.load.image('smallBrushGlow', 'assets/sprites/brush_icon_glow.png');
     this.load.image('largeBrush', 'assets/sprites/large_brush.png');
     this.load.image('largeBrushGlow', 'assets/sprites/brush_glow_large.png');
+    this.load.image('palette', 'assets/sprites/palette1.png');
+    this.load.image('splatGlow', 'assets/sprites/splat_glow.png');
 
     for (let i = 0; i < NUM_BRUSHES; i++) {
       this.load.image(`brush${i}`, `assets/sprites/brushes/${i}.png`);
