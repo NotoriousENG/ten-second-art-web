@@ -1,6 +1,6 @@
 import { Input } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
-import { getLinePoints } from '../utils/drawing';
+import { getLinePoints, getRandomColor } from '../utils/drawing';
 import { NUM_BRUSHES } from '../constants';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
@@ -11,21 +11,17 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 
 export class DrawScene extends Phaser.Scene {
   public speed = 200;
-
-  private cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
   private bg: Phaser.GameObjects.Image;
   private image: Phaser.Physics.Arcade.Sprite;
   private cat: Phaser.Physics.Arcade.Sprite;
-  private brush: Phaser.Physics.Arcade.Sprite;
   private splat: Phaser.Physics.Arcade.Sprite;
   private rt: Phaser.GameObjects.RenderTexture;
   private timer: Phaser.Time.TimerEvent;
-  private text: Phaser.GameObjects.Text;
   private lastPointerPosition: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0);
   private brushScale = 1;
   private drawing = false;
   private colors_used = 0;
-  private palette_color = this.random_good_color();
+  private palette_color = getRandomColor();
   private palatte_list = [this.palette_color];
   private water_color = 0;
   private selectedBrush = 0;
@@ -60,15 +56,6 @@ export class DrawScene extends Phaser.Scene {
     });
     this.splat.setInteractive({ pixelPerfect: true });
     this.splat.setTint(this.palette_color);
-
-    // add text to display the timer
-    this.text = this.add.text(400, 300, 'Hello World', {
-      fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
-      color: '#ff000000',
-    });
-
-    // This is a nice helper Phaser provides to create listeners for some of the most common keys.
-    this.cursorKeys = this.input.keyboard.createCursorKeys();
 
     this.rt = this.add.renderTexture(screen_center.x, screen_center.y, 600, 400).setOrigin(0.5, 0.5);
     // set render texture color to white
@@ -162,7 +149,7 @@ export class DrawScene extends Phaser.Scene {
       delay: 10000,
       callback: () => {
         this.colors_used++;
-        const new_color = this.random_good_color();
+        const new_color = getRandomColor();
         this.palette_color = new_color;
         this.palatte_list.push(new_color);
         this.splat.setTint(this.palette_color);
@@ -172,14 +159,9 @@ export class DrawScene extends Phaser.Scene {
     this.drawing = true;
   }
 
-  public random_good_color(): number {
-    return Math.random() * 0xffffff;
-    // TODO: HSLUV?
-  }
-
-  // ORDER OF EVENTS: 1. pick up brush
-  // TWO: Color is picked
-  // THREE: Timer starts
+  // ORDER OF EVENTS:
+  // ONE: Color is picked
+  // TWO: Timer starts when mouse is clicked
   private changeBrush(desiredBrush: number) {
     if (desiredBrush < 0) {
       desiredBrush = NUM_BRUSHES + desiredBrush; // 22 + (-1) = 21
