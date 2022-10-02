@@ -328,6 +328,8 @@ export class DrawScene extends Phaser.Scene {
     });
     this.download.on('pointerout', () => {
       this.downloadGlow.visible = false;
+    });
+    
     // add paw pieces
     for (let i = 0; i < NUM_PAW_PIECES; i++) {
       const pawPieceSize = icon_size;
