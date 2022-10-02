@@ -20,6 +20,10 @@ export class DrawScene extends Phaser.Scene {
   private easel: Phaser.Physics.Arcade.Sprite;
   private water: Phaser.Physics.Arcade.Sprite;
   private waterGlow: Phaser.Physics.Arcade.Sprite;
+  private smallBrush: Phaser.Physics.Arcade.Sprite;
+  private smallBrushGlow: Phaser.Physics.Arcade.Sprite;
+  private largeBrush: Phaser.Physics.Arcade.Sprite;
+  private largeBrushGlow: Phaser.Physics.Arcade.Sprite;
   private easelGroup: Phaser.Physics.Arcade.Group;
   private rt: Phaser.GameObjects.RenderTexture;
   private timer: Phaser.Time.TimerEvent;
@@ -89,7 +93,13 @@ export class DrawScene extends Phaser.Scene {
     this.easel = this.easelGroup.create(0, 0, 'easel') as Physics.Arcade.Sprite;
     this.water = this.easelGroup.create(0, 0, 'water');
     this.waterGlow = this.easelGroup.create(0, 0, 'waterGlow');
+    this.smallBrush = this.easelGroup.create(0, 0, 'smallBrush');
+    this.smallBrushGlow = this.easelGroup.create(0, 0, 'smallBrushGlow');
+    this.largeBrush = this.easelGroup.create(0, 0, 'largeBrush');
+    this.largeBrushGlow = this.easelGroup.create(0, 0, 'largeBrushGlow');
     this.waterGlow.visible = false;
+    this.smallBrushGlow.visible = false;
+    this.largeBrushGlow.visible = false;
     this.easelGroup.scaleXY(-0.55, -0.55);
     this.easelGroup.setXY(screen_center.x + 120, screen_center.y + 65);
     this.water.setInteractive({ pixelPerfect: true, useHandCursor: true });
@@ -110,6 +120,28 @@ export class DrawScene extends Phaser.Scene {
         (((water.g * 3 + Math.min(water.g, brush.g) * 2 + brush.g) / 6) << 8) |
         ((water.b * 3 + Math.min(water.b, brush.b) * 2 + brush.b) / 6);
       this.water.setTint(this.water_color);
+    });
+    this.smallBrush.setInteractive({ pixelPerfect: true, useHandCursor: true });
+    this.smallBrush.on('pointermove', () => {
+      this.smallBrushGlow.visible = true;
+    });
+    this.smallBrush.on('pointerout', () => {
+      this.smallBrushGlow.visible = false;
+    });
+    this.smallBrush.on('pointerdown', () => {
+      this.brushScale = Math.max(this.brushScale - 0.1, 0.1);
+      this.image.scale = this.brushScale;
+    });
+    this.largeBrush.setInteractive({ pixelPerfect: true, useHandCursor: true });
+    this.largeBrush.on('pointermove', () => {
+      this.largeBrushGlow.visible = true;
+    });
+    this.largeBrush.on('pointerout', () => {
+      this.largeBrushGlow.visible = false;
+    });
+    this.largeBrush.on('pointerdown', () => {
+      this.brushScale = Math.min(this.brushScale + 0.1, 10);
+      this.image.scale = this.brushScale;
     });
 
     this.rt = this.add.renderTexture(screen_center.x, screen_center.y, 600, 400).setOrigin(0.5, 0.5);
