@@ -1,7 +1,9 @@
-import { Input, Physics } from 'phaser';
+import { Input, Physics, Display } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
 import { getLinePoints, getRandomColor } from '../utils/drawing';
 import { NUM_BRUSHES } from '../constants';
+
+const Color = Display.Color;
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -96,21 +98,12 @@ export class DrawScene extends Phaser.Scene {
     this.water.on('pointerdown', () => {
       this.setOpacity(Math.max(this.opacity - 0.1, 0.1));
       this.water.alpha = Math.min(this.water.alpha + 0.02 * this.opacity, 1);
+      const water = Color.IntegerToRGB(this.water_color);
+      const brush = Color.IntegerToRGB(this.brush_color);
       this.water_color =
-        (((((this.water_color & 0xff0000) >> 16) * 3 +
-          Math.min((this.water_color & 0xff0000) >> 16, (this.brush_color & 0xff0000) >> 16) * 2 +
-          ((this.brush_color & 0xff0000) >> 16)) /
-          6) <<
-          16) |
-        (((((this.water_color & 0xff00) >> 8) * 3 +
-          Math.min((this.water_color & 0xff00) >> 8, (this.brush_color & 0xff00) >> 8) * 2 +
-          ((this.brush_color & 0xff00) >> 8)) /
-          6) <<
-          8) |
-        (((this.water_color & 0xff) * 3 +
-          Math.min(this.water_color & 0xff, this.brush_color & 0xff) * 2 +
-          (this.brush_color & 0xff)) /
-          6);
+        (((water.r * 3 + Math.min(water.r, brush.r) * 2 + brush.r) / 6) << 16) |
+        (((water.g * 3 + Math.min(water.g, brush.g) * 2 + brush.g) / 6) << 8) |
+        ((water.b * 3 + Math.min(water.b, brush.b) * 2 + brush.b) / 6);
       this.water.setTint(this.water_color);
     });
 
