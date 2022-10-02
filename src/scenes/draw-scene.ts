@@ -291,7 +291,7 @@ export class DrawScene extends Phaser.Scene {
       this.musicButtons[i].setOrigin(0.5, 0.5);
       this.musicButtons[i].scale = musicIconSize / 256;
       this.musicButtons[i].setTint(0xffffff);
-      this.musicButtons[i].setInteractive({ pixelPerfect: true, useHandCursor: true });
+      this.musicButtons[i].setInteractive({ useHandCursor: true });
       this.musicButtons[i].on('pointerdown', (pointer: Input.Pointer) => {
         if (pointer.isDown) {
           console.log('music changed to: ' + i);
