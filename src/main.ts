@@ -16,7 +16,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   physics: {
     default: 'arcade',
     arcade: {
-      debug: true, // set to true for an outline of the physics bodies
+      debug: false, // set to true for an outline of the physics bodies
     },
   },
 

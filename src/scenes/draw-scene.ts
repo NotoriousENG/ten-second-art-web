@@ -51,7 +51,7 @@ export class DrawScene extends Phaser.Scene {
   private palette_color = getRandomColor();
   private palatte_list = [this.palette_color];
   private water_color = 0xddeeff;
-  private selectedBrush = 0;
+  private selectedBrush = 9;
   private leftUI: Phaser.GameObjects.Image;
   private buttons: Phaser.Physics.Arcade.Sprite[] = [];
   private dirty = false;
@@ -61,17 +61,38 @@ export class DrawScene extends Phaser.Scene {
   private selectedMusic = 0;
   private pawPieces: Phaser.Physics.Arcade.Sprite[] = [];
   timer60: Phaser.Time.TimerEvent;
+  private started = false;
 
   constructor() {
     super(sceneConfig);
   }
 
   public create(): void {
+    this.started = true;
+    this.speed = 200;
+    this.brushScale = 1;
+    this.drawing = false;
+    this.colors_used = 0;
+    this.brush_color = 0;
+    this.palette_color = getRandomColor();
+    this.palatte_list = [this.palette_color];
+    this.water_color = 0xddeeff;
+    this.selectedBrush = 9;
+    this.buttons = [];
+    this.dirty = false;
+    this.opacity = 1;
+    this.music_tracks = [];
+    this.musicButtons = [];
+    this.selectedMusic = 0;
+    this.pawPieces = [];
+
     // add looping music to the scene
     for (let i = 0; i < NUM_TRACKS; i++) {
       this.music_tracks.push(this.sound.add(`track${i}`, { loop: true }));
     }
-    this.music_tracks[this.selectedMusic].play();
+    if (!this.started) {
+      this.music_tracks[this.selectedMusic].play();
+    }
 
     // get the center position of the screen
     const screen_center = new Phaser.Math.Vector2(getGameWidth(this) / 2, getGameHeight(this) / 2);
@@ -257,6 +278,7 @@ export class DrawScene extends Phaser.Scene {
     }
 
     // add three music icons at the top right of the screen alligned vertically
+    this.musicButtons = [];
     for (let i = 0; i < NUM_TRACKS; i++) {
       const musicIconSize = icon_size * 2;
       this.musicButtons.push(
@@ -269,7 +291,7 @@ export class DrawScene extends Phaser.Scene {
       this.musicButtons[i].setOrigin(0.5, 0.5);
       this.musicButtons[i].scale = musicIconSize / 256;
       this.musicButtons[i].setTint(0xffffff);
-      this.musicButtons[i].setInteractive({});
+      this.musicButtons[i].setInteractive({ pixelPerfect: true, useHandCursor: true });
       this.musicButtons[i].on('pointerdown', (pointer: Input.Pointer) => {
         if (pointer.isDown) {
           console.log('music changed to: ' + i);
@@ -287,35 +309,29 @@ export class DrawScene extends Phaser.Scene {
     }
     this.musicButtons[this.selectedMusic].setTint(0xff0000);
 
-    // create buttons
-    // this.frameIt = this.physics.add
-    //   .sprite(screen_center.x, screen_center.y - 350, 'frameIt')
-    //   .setOrigin(0.5, 0.5)
-    //   .setScale(0.25, 0.25);
-    // this.frameItGlow = this.physics.add
-    //   .sprite(screen_center.x, screen_center.y - 350, 'frameItGlow')
-    //   .setOrigin(0.5, 0.5)
-    //   .setScale(0.25, 0.25);
-    // //this.frameIt.visible = false;
-    // this.frameItGlow.visible = false;
-    // this.frameIt.on('pointermove', () => {
-    //   this.frameItGlow.visible = true;
-    // });
-    // this.frameIt.on('pointerout', () => {
-    //   this.frameItGlow.visible = false;
-    // });
-    // this.frameIt.on('pointerdown', () => {
-    //   this.fade.visible = true;
-    //   //this.frame.visible = true;
-    //   this.drawMode.visible = true;
-    //   this.credits.visible = true;
-    //   this.download.visible = true;
-    // });
-    // this.frameIt.setInteractive({ pixelPerfect: true, useHandCursor: true });
-
-    this.download = this.physics.add
-      .sprite(screen_center.x, screen_center.y - 350, 'download')
+    //create buttons
+    this.drawMode = this.physics.add
+      .sprite(screen_center.x, screen_center.y + 350, 'drawMore')
+      .setOrigin(0.5, 0.5)
       .setScale(0.25, 0.25);
+    this.drawModeGlow = this.physics.add
+      .sprite(screen_center.x, screen_center.y + 350, 'drawMoreGlow')
+      .setOrigin(0.5, 0.5)
+      .setScale(0.25, 0.25);
+    // this.drawMode.visible = false;
+    this.drawModeGlow.visible = false;
+    this.drawMode.on('pointermove', () => {
+      this.drawModeGlow.visible = true;
+    });
+    this.drawMode.on('pointerout', () => {
+      this.drawModeGlow.visible = false;
+    });
+    this.drawMode.on('pointerdown', () => {
+      this.scene.restart();
+    });
+    this.drawMode.setInteractive({ pixelPerfect: true, useHandCursor: true });
+
+    this.download = this.physics.add.sprite(screen_center.x, screen_center.y - 350, 'download').setScale(0.25, 0.25);
     this.downloadGlow = this.physics.add
       .sprite(screen_center.x, screen_center.y - 350, 'downloadGlow')
       .setScale(0.25, 0.25);
@@ -329,13 +345,13 @@ export class DrawScene extends Phaser.Scene {
     });
     this.download.on('pointerdown', () => {
       const a = document.createElement('a');
-      this.rt.snapshot((e: HTMLImageElement ) => {
+      this.rt.snapshot((e: HTMLImageElement) => {
         a.href = e.src;
         a.download = 'masterpiece.png';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-      })
+      });
     });
     this.download.setInteractive({ pixelPerfect: true, useHandCursor: true });
     this.download.visible = false;
