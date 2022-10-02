@@ -85,5 +85,11 @@ export class BootScene extends Phaser.Scene {
     for (let i = 0; i < NUM_BRUSHES; i++) {
       this.load.image(`brush${i}`, `assets/sprites/brushes/${i}.png`);
     }
+
+    // load music
+    this.load.audio('track0', 'assets/music/two_left_socks.ogg');
+    this.load.audio('track1', 'assets/music/rainy_village_8_bit_lofi.mp3');
+    this.load.audio('track2', 'assets/music/SummerChallenge.mp3');
+    this.load.audio('track3', 'assets/music/Fingersnap bar.mp3');
   }
 }

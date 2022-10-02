@@ -36,12 +36,17 @@ export class DrawScene extends Phaser.Scene {
   private buttons: Phaser.Physics.Arcade.Sprite[] = [];
   private dirty = false;
   private opacity = 1;
+  private music: Phaser.Sound.BaseSound;
 
   constructor() {
     super(sceneConfig);
   }
 
   public create(): void {
+    // add looping music to the scene
+    this.music = this.sound.add('track0', { loop: true });
+    this.music.play();
+
     // get the center position of the screen
     const screen_center = new Phaser.Math.Vector2(getGameWidth(this) / 2, getGameHeight(this) / 2);
 
