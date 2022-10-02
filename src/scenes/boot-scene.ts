@@ -96,7 +96,6 @@ export class BootScene extends Phaser.Scene {
     this.load.image('credits', 'assets/sprites/credits.png');
 
     this.load.image('frameItGlow', 'assets/sprites/frameitGlow.png');
-    this.load.image('titleGlow', 'assets/sprites/titleGlow.png');
     this.load.image('drawMoreGlow', 'assets/sprites/drawmoreGlow.png');
     this.load.image('downloadGlow', 'assets/sprites/downloadGlow.png');
     this.load.image('creditsGlow', 'assets/sprites/creditsGlow.png');

@@ -286,40 +286,93 @@ export class DrawScene extends Phaser.Scene {
     this.musicButtons[this.selectedMusic].setTint(0xff0000);
 
     // create buttons
-    this.frameIt = this.physics.add
-      .sprite(screen_center.x, screen_center.y - 350, 'frameIt')
+    // this.frameIt = this.physics.add
+    //   .sprite(screen_center.x, screen_center.y - 350, 'frameIt')
+    //   .setOrigin(0.5, 0.5)
+    //   .setScale(0.25, 0.25);
+    // this.frameItGlow = this.physics.add
+    //   .sprite(screen_center.x, screen_center.y - 350, 'frameItGlow')
+    //   .setOrigin(0.5, 0.5)
+    //   .setScale(0.25, 0.25);
+    // //this.frameIt.visible = false;
+    // this.frameItGlow.visible = false;
+    // this.frameIt.on('pointermove', () => {
+    //   this.frameItGlow.visible = true;
+    // });
+    // this.frameIt.on('pointerout', () => {
+    //   this.frameItGlow.visible = false;
+    // });
+    // this.frameIt.on('pointerdown', () => {
+    //   this.fade.visible = true;
+    //   //this.frame.visible = true;
+    //   this.drawMode.visible = true;
+    //   this.credits.visible = true;
+    //   this.download.visible = true;
+    // });
+    // this.frameIt.setInteractive({ pixelPerfect: true, useHandCursor: true });
+
+    this.download = this.physics.add
+      .sprite(screen_center.x, screen_center.y - 350, 'download')
       .setOrigin(0.5, 0.5)
       .setScale(0.25, 0.25);
-    this.frameItGlow = this.physics.add
-      .sprite(screen_center.x, screen_center.y - 350, 'frameItGlow')
+    this.downloadGlow = this.physics.add
+      .sprite(screen_center.x, screen_center.y - 350, 'dowloadGlow')
       .setOrigin(0.5, 0.5)
       .setScale(0.25, 0.25);
     //this.frameIt.visible = false;
-    this.frameItGlow.visible = false;
-    this.frameIt.on('pointermove', () => {
-      this.frameItGlow.visible = true;
+    this.downloadGlow.visible = false;
+    this.download.on('pointermove', () => {
+      this.downloadGlow.visible = true;
     });
-    this.frameIt.on('pointerout', () => {
-      this.frameItGlow.visible = false;
+    this.download.on('pointerout', () => {
+      this.downloadGlow.visible = false;
     });
-    this.frameIt.on('pointerdown', () => {
-      // TODO!!!!
+    this.download.on('pointerdown', () => {
+      // this.fade.visible = true;
+      const a = document.createElement('a');
+      a.href = this.rt.canvas.toDataURL();
+      a.download = 'masterpiece.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     });
-    this.frameIt.setInteractive({ pixelPerfect: true, useHandCursor: true });
+    this.download.setInteractive({ pixelPerfect: true, useHandCursor: true });
+    this.download.visible = false;
 
-    // if we click, draw a dot
-    this.input.on('pointerdown', (pointer: Input.Pointer) => {
-      const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
-        new Phaser.Math.Vector2(
-          this.rt.x - this.rt.width * this.rt.originX,
-          this.rt.y - this.rt.height * this.rt.originY,
-        ),
-      );
-      if (pointer.isDown && this.drawing) {
-        this.rt.draw(this.image, pointerPosition.x, pointerPosition.y);
-        this.dirty = true;
-      }
-    });
+    // this.drawMode = this.physics.add
+    //   .sprite(screen_center.x, screen_center.y + 350, 'drawMore')
+    //   .setOrigin(0.5, 0.5)
+    //   .setScale(0.25, 0.25);
+    // this.drawModeGlow = this.physics.add
+    //   .sprite(screen_center.x, screen_center.y + 350, 'drawMoreGlow')
+    //   .setOrigin(0.5, 0.5)
+    //   .setScale(0.25, 0.25);
+    // //this.drawMode.visible = false;
+    // this.drawModeGlow.visible = false;
+    // this.drawMode.on('pointermove', () => {
+    //   this.drawModeGlow.visible = true;
+    // });
+    // this.drawMode.on('pointerout', () => {
+    //   this.drawModeGlow.visible = false;
+    // });
+    // this.drawMode.on('pointerdown', () => {
+    //   this.scene.restart();
+    // });
+    // this.drawMode.setInteractive({ pixelPerfect: true, useHandCursor: true });
+
+    // // if we click, draw a dot
+    // this.input.on('pointerdown', (pointer: Input.Pointer) => {
+    //   const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
+    //     new Phaser.Math.Vector2(
+    //       this.rt.x - this.rt.width * this.rt.originX,
+    //       this.rt.y - this.rt.height * this.rt.originY,
+    //     ),
+    //   );
+    //   if (pointer.isDown && this.drawing) {
+    //     this.rt.draw(this.image, pointerPosition.x, pointerPosition.y);
+    //     this.dirty = true;
+    //   }
+    // });
 
     // set image scale when using bracket keys
     this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
@@ -368,7 +421,7 @@ export class DrawScene extends Phaser.Scene {
     this.timer = this.time.addEvent({
       delay: 10000,
       callback: () => {
-        if (this.colors_used == 1) {
+        if (this.colors_used == 6) {
           this.colors_used++;
           const new_color = getRandomColor();
           this.palette_color = new_color;
@@ -379,7 +432,7 @@ export class DrawScene extends Phaser.Scene {
           this.timer = this.time.addEvent({
             delay: 2000,
             callback: () => {
-              this.frameIt.visible = true;
+              this.download.visible = true;
               this.drawing = false;
             },
             loop: true,
