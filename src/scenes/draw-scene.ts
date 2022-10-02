@@ -119,7 +119,7 @@ export class DrawScene extends Phaser.Scene {
           console.log('brush changed to: ' + i);
           this.buttons[this.selectedBrush].setTint(0xffffff);
           this.changeBrush(i);
-          this.buttons[this.selectedBrush].setTint(this.palette_color);
+          this.buttons[this.selectedBrush].setTint(this.image.tintTopLeft);
         }
       });
       this.buttons[i].visible = false; // not visible until we can draw
