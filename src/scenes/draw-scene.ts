@@ -49,19 +49,10 @@ export class DrawScene extends Phaser.Scene {
     this.cat.scale = 0.2;
     this.cat.setPosition(screen_center.x / 2, getGameHeight(this) - (this.cat.height * this.cat.scaleY) / 2);
 
-    // add debug brush
-    this.brush = this.physics.add.sprite(10, 50, 'brush_icon').setOrigin(0.5, 0.5);
-    this.brush.scale = 0.05;
-    this.brush.once('pointerdown', () => {
-      this.splat.visible = true;
-    });
-    this.brush.setInteractive({ pixelPerfect: true });
-
     // add debug palatte
     this.splat = this.physics.add.sprite(100, 100, 'splat').setOrigin(0.5, 0.5);
     this.splat.scale = 0.2;
-    this.splat.visible = false;
-    this.splat.on('pointerdown', (event) => {
+    this.splat.on('pointerdown', () => {
       this.image.setTint(this.palette_color);
       if (!this.drawing) {
         this.start_drawing();
