@@ -68,7 +68,6 @@ export class DrawScene extends Phaser.Scene {
   }
 
   public create(): void {
-    this.started = true;
     this.speed = 200;
     this.brushScale = 1;
     this.drawing = false;
@@ -93,6 +92,7 @@ export class DrawScene extends Phaser.Scene {
     if (!this.started) {
       this.music_tracks[this.selectedMusic].play();
     }
+    this.started = true;
 
     // get the center position of the screen
     const screen_center = new Phaser.Math.Vector2(getGameWidth(this) / 2, getGameHeight(this) / 2);
