@@ -15,11 +15,18 @@ export class DrawScene extends Phaser.Scene {
   private bg: Phaser.GameObjects.Image;
   private image: Phaser.Physics.Arcade.Sprite;
   private cat: Phaser.Physics.Arcade.Sprite;
+  private brush: Phaser.Physics.Arcade.Sprite;
+  private splat: Phaser.Physics.Arcade.Sprite;
   private rt: Phaser.GameObjects.RenderTexture;
   private timer: Phaser.Time.TimerEvent;
   private text: Phaser.GameObjects.Text;
   private lastPointerPosition: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0);
   private brushScale = 1;
+  private drawing = false;
+  private colors_used = 0;
+  private palette_color = this.random_good_color();
+  private palatte_list = [this.palette_color];
+  private water_color = 0;
 
   constructor() {
     super(sceneConfig);
@@ -40,14 +47,26 @@ export class DrawScene extends Phaser.Scene {
     this.cat.scale = 0.2;
     this.cat.setPosition(screen_center.x / 2, getGameHeight(this) - (this.cat.height * this.cat.scaleY) / 2);
 
-    // create a 10 second timer
-    this.timer = this.time.addEvent({
-      delay: 10000,
-      callback: () => {
-        this.image.setTint(Math.random() * 0xffffff);
-      },
-      loop: true,
+    // add debug brush
+    this.brush = this.physics.add.sprite(10, 50, 'brush_icon').setOrigin(0.5, 0.5);
+    this.brush.scale = 0.05;
+    this.brush.once('pointerdown', () => {
+      this.splat.visible = true;
     });
+    this.brush.setInteractive({ pixelPerfect: true });
+
+    // add debug palatte
+    this.splat = this.physics.add.sprite(100, 100, 'splat').setOrigin(0.5, 0.5);
+    this.splat.scale = 0.2;
+    this.splat.visible = false;
+    this.splat.on('pointerdown', (event) => {
+      this.image.setTint(this.palette_color);
+      if (!this.drawing) {
+        this.start_drawing();
+      }
+    });
+    this.splat.setInteractive({ pixelPerfect: true });
+    this.splat.setTint(this.palette_color);
 
     // add text to display the timer
     this.text = this.add.text(400, 300, 'Hello World', {
@@ -64,6 +83,7 @@ export class DrawScene extends Phaser.Scene {
 
     // Add a virtual brush, moves with mouse
     this.image = this.physics.add.sprite(getGameWidth(this) / 2, getGameHeight(this) / 2, 'brush');
+
     // set image color to black
     this.image.setTint(0x000000);
 
@@ -78,7 +98,7 @@ export class DrawScene extends Phaser.Scene {
         ),
       );
 
-      if (pointer.isDown) {
+      if (pointer.isDown && this.drawing) {
         // draw a line from the last pointer position to the current pointer position fill in gaps dynamically
         getLinePoints(this.lastPointerPosition, pointerPosition, (this.image.width * this.brushScale) / 4).forEach(
           (point) => {
@@ -97,7 +117,7 @@ export class DrawScene extends Phaser.Scene {
           this.rt.y - this.rt.height * this.rt.originY,
         ),
       );
-      if (pointer.isDown) {
+      if (pointer.isDown && this.drawing) {
         this.rt.draw(this.image, pointerPosition.x, pointerPosition.y);
       }
     });
@@ -127,4 +147,36 @@ export class DrawScene extends Phaser.Scene {
     this.image.setPosition(this.input.activePointer.x, this.input.activePointer.y);
     //this.image.setPosition(normalizedVelocity.x * this.speed, normalizedVelocity.y * this.speed);
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  public save_image(): void {}
+
+  public go_to_cat_stamp(): void {
+    this.scene.start('Stamp');
+  }
+
+  public start_drawing(): void {
+    // create a 10 second timer
+    this.timer = this.time.addEvent({
+      delay: 10000,
+      callback: () => {
+        this.colors_used++;
+        const new_color = this.random_good_color();
+        this.palette_color = new_color;
+        this.palatte_list.push(new_color);
+        this.splat.setTint(this.palette_color);
+      },
+      loop: true,
+    });
+    this.drawing = true;
+  }
+
+  public random_good_color(): number {
+    return Math.random() * 0xffffff;
+    // TODO: HSLUV?
+  }
+
+  // ORDER OF EVENTS: 1. pick up brush
+  // TWO: Color is picked
+  // THREE: Timer starts
 }

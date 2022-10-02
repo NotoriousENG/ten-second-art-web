@@ -58,7 +58,7 @@ export class BootScene extends Phaser.Scene {
       progressBar.destroy();
       progressBarContainer.destroy();
 
-      this.scene.start('MainMenu');
+      this.scene.start('Draw');
     });
 
     this.loadAssets();
@@ -77,5 +77,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image('cat', 'assets/sprites/cat-900x900.png');
     this.load.image('brush', 'assets/sprites/brush1.png');
     this.load.image('bg', 'assets/sprites/test_bg.jpg');
+    this.load.image('splat', 'assets/sprites/splat.jpg');
+    this.load.image('brush_icon', 'assets/sprites/brush_icon.jpg');
   }
 }
