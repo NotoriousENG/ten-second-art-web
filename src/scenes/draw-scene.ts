@@ -91,7 +91,7 @@ export class DrawScene extends Phaser.Scene {
       this.waterGlow.visible = false;
     });
     this.water.on('pointerdown', () => {
-      this.setOpacity(Math.max(this.opacity - 0.2, 0.1));
+      this.setOpacity(Math.max(this.opacity - 0.1, 0.1));
     });
 
     this.rt = this.add.renderTexture(screen_center.x, screen_center.y, 600, 400).setOrigin(0.5, 0.5);
@@ -110,7 +110,7 @@ export class DrawScene extends Phaser.Scene {
       delay: 10,
       callback: () => {
         if (this.dirty) {
-          this.setOpacity(this.opacity - 0.002);
+          this.setOpacity(this.opacity - 0.001);
           this.dirty = false;
         }
       },
@@ -254,6 +254,6 @@ export class DrawScene extends Phaser.Scene {
 
   private setOpacity(opacity: number) {
     this.opacity = opacity;
-    this.image.alpha = Math.pow(opacity, 6);
+    this.image.alpha = Math.pow(opacity, 8);
   }
 }
