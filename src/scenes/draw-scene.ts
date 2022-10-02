@@ -1,6 +1,6 @@
 import { Input, Physics } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
-import { getLinePoints } from '../utils/drawing';
+import { getLinePoints, getRandomColor } from '../utils/drawing';
 import { NUM_BRUSHES } from '../constants';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
@@ -11,8 +11,6 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 
 export class DrawScene extends Phaser.Scene {
   public speed = 200;
-
-  private cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
   private bg: Phaser.GameObjects.Image;
   private image: Phaser.Physics.Arcade.Sprite;
   private cat: Phaser.Physics.Arcade.Sprite;
@@ -23,15 +21,16 @@ export class DrawScene extends Phaser.Scene {
   private easelGroup: Phaser.Physics.Arcade.Group;
   private rt: Phaser.GameObjects.RenderTexture;
   private timer: Phaser.Time.TimerEvent;
-  private text: Phaser.GameObjects.Text;
   private lastPointerPosition: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0);
   private brushScale = 1;
   private drawing = false;
   private colors_used = 0;
-  private palette_color = this.random_good_color();
+  private palette_color = getRandomColor();
   private palatte_list = [this.palette_color];
   private water_color = 0;
   private selectedBrush = 0;
+  private leftUI: Phaser.GameObjects.Image;
+  private buttons: Phaser.Physics.Arcade.Sprite[] = [];
 
   constructor() {
     super(sceneConfig);
@@ -43,7 +42,6 @@ export class DrawScene extends Phaser.Scene {
 
     // create background
     this.bg = this.add.image(screen_center.x, screen_center.y, 'bg').setOrigin(0.5, 0.5);
-
     this.bg.displayWidth = this.sys.canvas.width;
     this.bg.displayHeight = this.sys.canvas.height;
 
@@ -57,29 +55,22 @@ export class DrawScene extends Phaser.Scene {
     this.splat.scale = 0.2;
     this.splat.on('pointerdown', () => {
       this.image.setTint(this.palette_color);
+      this.buttons[this.selectedBrush].setTint(this.palette_color);
       if (!this.drawing) {
+        // make sure ui is visible
+        this.image.visible = true;
+        this.leftUI.visible = true;
+        this.buttons.forEach((button) => {
+          button.visible = true;
+          // set ui as interactive
+          button.setInteractive({ useHandCursor: true });
+        });
+
         this.start_drawing();
       }
     });
     this.splat.setInteractive({ pixelPerfect: true });
     this.splat.setTint(this.palette_color);
-
-    // add text to display the timer
-    this.text = this.add.text(400, 300, 'Hello World', {
-      fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
-      color: '#ff000000',
-    });
-
-    // This is a nice helper Phaser provides to create listeners for some of the most common keys.
-    this.cursorKeys = this.input.keyboard.createCursorKeys();
-
-    // setup easel
-    this.easelGroup = this.physics.add.group();
-    this.easel = this.easelGroup.create(0, 0, 'easel') as Physics.Arcade.Sprite;
-    this.water = this.easelGroup.create(0, 0, 'water');
-    this.waterGlow = this.easelGroup.create(0, 0, 'waterGlow');
-    this.easelGroup.scaleXY(-0.55, -0.55);
-    this.easelGroup.setXY(screen_center.x + 120, screen_center.y + 65);
 
     this.rt = this.add.renderTexture(screen_center.x, screen_center.y, 600, 400).setOrigin(0.5, 0.5);
     // set render texture color to white
@@ -89,6 +80,7 @@ export class DrawScene extends Phaser.Scene {
     this.image = this.physics.add.sprite(screen_center.x, screen_center.y, `brush${this.selectedBrush}`);
     // set image color to black
     this.image.setTint(0x000000);
+    this.image.visible = false; // not visible until we can draw
 
     this.image.scale = this.brushScale;
 
@@ -111,6 +103,31 @@ export class DrawScene extends Phaser.Scene {
       }
       this.lastPointerPosition.copy(pointerPosition);
     });
+
+    this.leftUI = this.add.image(32, screen_center.y, 'brush1'); // this brush 1 texture is carrying me
+    this.leftUI.displayWidth = 64;
+    this.leftUI.displayHeight = 1080;
+    this.leftUI.setTint(0x000000);
+    this.leftUI.visible = false; // not visible until we can draw
+
+    // @TODO - handle unlockables, perhaps just limit num brushes for sequential unlocks
+    // or have a list of unlocked brushes ignore rest (use a seperate counter for how many drawn?)
+    for (let i = 0; i < NUM_BRUSHES; i++) {
+      // equally space white sprites on the leftUI with 12 px padding
+      this.buttons.push(this.physics.add.sprite(32, 32 + i * 32 + 12 * i, `brush${i}`));
+      this.buttons[i].setOrigin(0.5, 0.5);
+      this.buttons[i].scale = 0.5;
+      // add an event listener to each button to change the brush
+      this.buttons[i].on('pointerdown', (pointer: Input.Pointer) => {
+        if (pointer.isDown) {
+          console.log('brush changed to: ' + i);
+          this.buttons[this.selectedBrush].setTint(0xffffff);
+          this.changeBrush(i);
+          this.buttons[this.selectedBrush].setTint(this.image.tintTopLeft);
+        }
+      });
+      this.buttons[i].visible = false; // not visible until we can draw
+    }
 
     // if we click, draw a dot
     this.input.on('pointerdown', (pointer: Input.Pointer) => {
@@ -173,7 +190,7 @@ export class DrawScene extends Phaser.Scene {
       delay: 10000,
       callback: () => {
         this.colors_used++;
-        const new_color = this.random_good_color();
+        const new_color = getRandomColor();
         this.palette_color = new_color;
         this.palatte_list.push(new_color);
         this.splat.setTint(this.palette_color);
@@ -183,14 +200,9 @@ export class DrawScene extends Phaser.Scene {
     this.drawing = true;
   }
 
-  public random_good_color(): number {
-    return Math.random() * 0xffffff;
-    // TODO: HSLUV?
-  }
-
-  // ORDER OF EVENTS: 1. pick up brush
-  // TWO: Color is picked
-  // THREE: Timer starts
+  // ORDER OF EVENTS:
+  // ONE: Color is picked
+  // TWO: Timer starts when mouse is clicked
   private changeBrush(desiredBrush: number) {
     if (desiredBrush < 0) {
       desiredBrush = NUM_BRUSHES + desiredBrush; // 22 + (-1) = 21

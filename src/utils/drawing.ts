@@ -18,6 +18,10 @@ export function getLinePoints(p1: Phaser.Math.Vector2, p2: Phaser.Math.Vector2, 
   return points;
 }
 
+export function getRandomColor(): number {
+  return Math.random() * 0xffffff;
+}
+
 export function invert_color(color: number): number {
   return 0xffffff - color;
 }
