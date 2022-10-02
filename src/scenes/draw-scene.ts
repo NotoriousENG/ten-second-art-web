@@ -114,17 +114,23 @@ export class DrawScene extends Phaser.Scene {
 
     this.leftUI = this.add.image(32, screen_center.y, 'brush1'); // this brush 1 texture is carrying me
     this.leftUI.displayWidth = 64;
-    this.leftUI.displayHeight = 1080;
+    this.leftUI.displayHeight = getGameHeight(this);
     this.leftUI.setTint(0x000000);
     this.leftUI.visible = false; // not visible until we can draw
+
+    // get max resolution for brushes icons to fit on screen vertically with some padding
+    const icon_size = getGameHeight(this) / (NUM_BRUSHES + 3);
+
+    // get max padding between icons
+    const icon_padding = (getGameHeight(this) - icon_size * (NUM_BRUSHES + 1)) / (NUM_BRUSHES + 1);
 
     // @TODO - handle unlockables, perhaps just limit num brushes for sequential unlocks
     // or have a list of unlocked brushes ignore rest (use a seperate counter for how many drawn?)
     for (let i = 0; i < NUM_BRUSHES; i++) {
       // equally space white sprites on the leftUI with 12 px padding
-      this.buttons.push(this.physics.add.sprite(32, 32 + i * 32 + 12 * i, `brush${i}`));
+      this.buttons.push(this.physics.add.sprite(icon_size, icon_size + i * icon_size + i * icon_padding, `brush${i}`));
       this.buttons[i].setOrigin(0.5, 0.5);
-      this.buttons[i].scale = 0.5;
+      this.buttons[i].scale = icon_size / 64;
       // add an event listener to each button to change the brush
       this.buttons[i].on('pointerdown', (pointer: Input.Pointer) => {
         if (pointer.isDown) {
