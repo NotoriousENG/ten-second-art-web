@@ -318,7 +318,7 @@ export class DrawScene extends Phaser.Scene {
       .sprite(screen_center.x, screen_center.y + 350, 'drawMoreGlow')
       .setOrigin(0.5, 0.5)
       .setScale(0.25, 0.25);
-    // this.drawMode.visible = false;
+    this.drawMode.visible = false;
     this.drawModeGlow.visible = false;
     this.drawMode.on('pointermove', () => {
       this.drawModeGlow.visible = true;
@@ -474,6 +474,7 @@ export class DrawScene extends Phaser.Scene {
           this.timer = this.time.addEvent({
             delay: 2000,
             callback: () => {
+              this.drawMode.visible = true;
               this.download.visible = true;
               this.drawing = false;
             },
