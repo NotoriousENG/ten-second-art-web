@@ -1,5 +1,5 @@
 import { getGameWidth, getGameHeight } from '../helpers';
-import { NUM_BRUSHES } from '../constants';
+import { NUM_BRUSHES, NUM_PAW_PIECES } from '../constants';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -91,6 +91,11 @@ export class BootScene extends Phaser.Scene {
 
     for (let i = 0; i < NUM_BRUSHES; i++) {
       this.load.image(`brush${i}`, `assets/sprites/brushes/${i}.png`);
+    }
+
+    // load paw pieces
+    for (let i = 0; i < NUM_PAW_PIECES; i++) {
+      this.load.image(`paw${i}`, `assets/sprites/paw/paw${i}.png`);
     }
 
     // load music

@@ -1,7 +1,7 @@
 import { Input, Physics, Display } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
 import { getLinePoints, getRandomColor } from '../utils/drawing';
-import { NUM_BRUSHES, NUM_TRACKS } from '../constants';
+import { NUM_BRUSHES, NUM_PAW_PIECES, NUM_TRACKS } from '../constants';
 
 const Color = Display.Color;
 
@@ -45,6 +45,8 @@ export class DrawScene extends Phaser.Scene {
   private music_tracks: Phaser.Sound.BaseSound[] = [];
   private musicButtons: Phaser.Physics.Arcade.Sprite[] = [];
   private selectedMusic = 0;
+  private pawPieces: Phaser.Physics.Arcade.Sprite[] = [];
+  timer60: Phaser.Time.TimerEvent;
 
   constructor() {
     super(sceneConfig);
@@ -271,6 +273,16 @@ export class DrawScene extends Phaser.Scene {
     }
     this.musicButtons[this.selectedMusic].setTint(0xff0000);
 
+    // add paw pieces
+    for (let i = 0; i < NUM_PAW_PIECES; i++) {
+      const pawPieceSize = icon_size;
+      this.pawPieces.push(this.physics.add.sprite(screen_center.x + 220, screen_center.y + 160, `paw${i}`));
+      this.pawPieces[i].setOrigin(0.5, 0.5);
+      this.pawPieces[i].scale = pawPieceSize / 512;
+      this.pawPieces[i].setTint(0xffffff);
+    }
+    this.togglePaw(false);
+
     // if we click, draw a dot
     this.input.on('pointerdown', (pointer: Input.Pointer) => {
       const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
@@ -340,6 +352,13 @@ export class DrawScene extends Phaser.Scene {
       },
       loop: true,
     });
+
+    this.timer60 = this.time.addEvent({
+      delay: 60000,
+      callback: () => {
+        this.togglePaw(true);
+      },
+    });
     this.drawing = true;
   }
 
@@ -366,5 +385,14 @@ export class DrawScene extends Phaser.Scene {
   private setOpacity(opacity: number) {
     this.opacity = opacity;
     this.image.alpha = Math.pow(opacity, 8);
+  }
+
+  private togglePaw(active) {
+    this.pawPieces.forEach((pawPiece, index) => {
+      if (active) {
+        pawPiece.setTint(this.palatte_list[index]);
+      }
+      pawPiece.setVisible(active);
+    });
   }
 }
