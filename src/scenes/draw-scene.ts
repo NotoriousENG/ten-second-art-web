@@ -25,9 +25,10 @@ export class DrawScene extends Phaser.Scene {
   private brushScale = 1;
   private drawing = false;
   private colors_used = 0;
+  private brush_color = 0;
   private palette_color = getRandomColor();
   private palatte_list = [this.palette_color];
-  private water_color = 0;
+  private water_color = 0xddeeff;
   private selectedBrush = 0;
   private leftUI: Phaser.GameObjects.Image;
   private buttons: Phaser.Physics.Arcade.Sprite[] = [];
@@ -56,6 +57,7 @@ export class DrawScene extends Phaser.Scene {
     this.splat = this.physics.add.sprite(100, 100, 'splat').setOrigin(0.5, 0.5);
     this.splat.scale = 0.2;
     this.splat.on('pointerdown', () => {
+      this.brush_color = this.palette_color;
       this.image.setTint(this.palette_color);
       this.buttons[this.selectedBrush].setTint(this.palette_color);
       this.setOpacity(1);
@@ -90,8 +92,26 @@ export class DrawScene extends Phaser.Scene {
     this.water.on('pointerout', () => {
       this.waterGlow.visible = false;
     });
+    this.water.alpha = 0.4;
     this.water.on('pointerdown', () => {
       this.setOpacity(Math.max(this.opacity - 0.1, 0.1));
+      this.water.alpha = Math.min(this.water.alpha + 0.02 * this.opacity, 1);
+      this.water_color =
+        (((((this.water_color & 0xff0000) >> 16) * 3 +
+          Math.min((this.water_color & 0xff0000) >> 16, (this.brush_color & 0xff0000) >> 16) * 2 +
+          ((this.brush_color & 0xff0000) >> 16)) /
+          6) <<
+          16) |
+        (((((this.water_color & 0xff00) >> 8) * 3 +
+          Math.min((this.water_color & 0xff00) >> 8, (this.brush_color & 0xff00) >> 8) * 2 +
+          ((this.brush_color & 0xff00) >> 8)) /
+          6) <<
+          8) |
+        (((this.water_color & 0xff) * 3 +
+          Math.min(this.water_color & 0xff, this.brush_color & 0xff) * 2 +
+          (this.brush_color & 0xff)) /
+          6);
+      this.water.setTint(this.water_color);
     });
 
     this.rt = this.add.renderTexture(screen_center.x, screen_center.y, 600, 400).setOrigin(0.5, 0.5);
