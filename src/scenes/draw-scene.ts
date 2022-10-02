@@ -321,15 +321,26 @@ export class DrawScene extends Phaser.Scene {
       .sprite(screen_center.x, screen_center.y - 350, 'dowloadGlow')
       .setOrigin(0.5, 0.5)
       .setScale(0.25, 0.25);
-    //this.frameIt.visible = false;
-    this.downloadGlow.visible = false;
+    this.download.visible = false;
     this.download.on('pointermove', () => {
       this.downloadGlow.visible = true;
     });
     this.download.on('pointerout', () => {
       this.downloadGlow.visible = false;
     });
-    
+    this.download.on('pointerdown', () => {
+      const a = document.createElement('a');
+      this.rt.snapshot((e: HTMLImageElement ) => {
+        a.href = e.src;
+        a.download = 'masterpiece.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      })
+    });
+    this.download.setInteractive({ pixelPerfect: true, useHandCursor: true });
+    this.download.visible = false;
+
     // add paw pieces
     for (let i = 0; i < NUM_PAW_PIECES; i++) {
       const pawPieceSize = icon_size;
@@ -353,17 +364,6 @@ export class DrawScene extends Phaser.Scene {
         this.dirty = true;
       }
     });
-    this.download.on('pointerdown', () => {
-      // this.fade.visible = true;
-      const a = document.createElement('a');
-      a.href = this.rt.canvas.toDataURL();
-      a.download = 'masterpiece.png';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    });
-    this.download.setInteractive({ pixelPerfect: true, useHandCursor: true });
-    this.download.visible = false;
 
     // this.drawMode = this.physics.add
     //   .sprite(screen_center.x, screen_center.y + 350, 'drawMore')
@@ -447,7 +447,7 @@ export class DrawScene extends Phaser.Scene {
     this.timer = this.time.addEvent({
       delay: 10000,
       callback: () => {
-        if (this.colors_used == 6) {
+        if (this.colors_used < 1) {
           this.colors_used++;
           const new_color = getRandomColor();
           this.palette_color = new_color;
