@@ -85,6 +85,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image('smallBrushGlow', 'assets/sprites/brush_icon_glow.png');
     this.load.image('largeBrush', 'assets/sprites/large_brush.png');
     this.load.image('largeBrushGlow', 'assets/sprites/brush_glow_large.png');
+    this.load.image('musicIcon', 'assets/sprites/music-icon.png');
 
     for (let i = 0; i < NUM_BRUSHES; i++) {
       this.load.image(`brush${i}`, `assets/sprites/brushes/${i}.png`);
@@ -94,6 +95,6 @@ export class BootScene extends Phaser.Scene {
     this.load.audio('track0', 'assets/music/two_left_socks.ogg');
     this.load.audio('track1', 'assets/music/rainy_village_8_bit_lofi.mp3');
     this.load.audio('track2', 'assets/music/SummerChallenge.mp3');
-    this.load.audio('track3', 'assets/music/Fingersnap bar.mp3');
+    this.load.audio('track3', 'assets/music/Fingersnap-bar.mp3');
   }
 }
