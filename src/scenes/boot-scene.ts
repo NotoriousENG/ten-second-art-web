@@ -1,4 +1,5 @@
 import { getGameWidth, getGameHeight } from '../helpers';
+import { NUM_BRUSHES } from '../constants';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -75,9 +76,12 @@ export class BootScene extends Phaser.Scene {
     // Source: Open Game Art
     this.load.image('man', 'assets/sprites/character.png');
     this.load.image('cat', 'assets/sprites/cat-900x900.png');
-    this.load.image('brush', 'assets/sprites/brushes/default-brush.png');
     this.load.image('bg', 'assets/sprites/test_bg.jpg');
     this.load.image('splat', 'assets/sprites/splat.jpg');
     this.load.image('brush_icon', 'assets/sprites/brush_icon.jpg');
+
+    for (let i = 0; i < NUM_BRUSHES; i++) {
+      this.load.image(`brush${i}`, `assets/sprites/brushes/${i}.png`);
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { Input } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
 import { getLinePoints } from '../utils/drawing';
+import { NUM_BRUSHES } from '../constants';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -27,6 +28,7 @@ export class DrawScene extends Phaser.Scene {
   private palette_color = this.random_good_color();
   private palatte_list = [this.palette_color];
   private water_color = 0;
+  private selectedBrush = 0;
 
   constructor() {
     super(sceneConfig);
@@ -82,8 +84,7 @@ export class DrawScene extends Phaser.Scene {
     this.rt.fill(0xffffff);
 
     // Add a virtual brush, moves with mouse
-    this.image = this.physics.add.sprite(getGameWidth(this) / 2, getGameHeight(this) / 2, 'brush');
-
+    this.image = this.physics.add.sprite(getGameWidth(this) / 2, getGameHeight(this) / 2, `brush${this.selectedBrush}`);
     // set image color to black
     this.image.setTint(0x000000);
 
@@ -140,6 +141,15 @@ export class DrawScene extends Phaser.Scene {
         this.image.alpha = Math.min(this.image.alpha + 0.05, 1);
       }
     });
+
+    // change brush when pressing up or down
+    this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'ArrowUp') {
+        this.changeBrush(this.selectedBrush + 1);
+      } else if (event.key === 'ArrowDown') {
+        this.changeBrush(this.selectedBrush - 1);
+      }
+    });
   }
 
   public update(): void {
@@ -179,4 +189,11 @@ export class DrawScene extends Phaser.Scene {
   // ORDER OF EVENTS: 1. pick up brush
   // TWO: Color is picked
   // THREE: Timer starts
+  private changeBrush(desiredBrush: number) {
+    if (desiredBrush < 0) {
+      desiredBrush = NUM_BRUSHES + desiredBrush; // 22 + (-1) = 21
+    }
+    this.selectedBrush = desiredBrush % NUM_BRUSHES;
+    this.image.setTexture(`brush${this.selectedBrush}`);
+  }
 }
