@@ -72,6 +72,14 @@ export class DrawScene extends Phaser.Scene {
     this.splat.setInteractive({ pixelPerfect: true });
     this.splat.setTint(this.palette_color);
 
+    // setup easel
+    this.easelGroup = this.physics.add.group();
+    this.easel = this.easelGroup.create(0, 0, 'easel') as Physics.Arcade.Sprite;
+    this.water = this.easelGroup.create(0, 0, 'water');
+    this.waterGlow = this.easelGroup.create(0, 0, 'waterGlow');
+    this.easelGroup.scaleXY(-0.55, -0.55);
+    this.easelGroup.setXY(screen_center.x + 120, screen_center.y + 65);
+
     this.rt = this.add.renderTexture(screen_center.x, screen_center.y, 600, 400).setOrigin(0.5, 0.5);
     // set render texture color to white
     this.rt.fill(0xffffff);
