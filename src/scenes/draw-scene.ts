@@ -62,6 +62,7 @@ export class DrawScene extends Phaser.Scene {
   private pawPieces: Phaser.Physics.Arcade.Sprite[] = [];
   timer60: Phaser.Time.TimerEvent;
   private started = false;
+  fullscreenButton: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
   constructor() {
     super(sceneConfig);
@@ -241,6 +242,18 @@ export class DrawScene extends Phaser.Scene {
         );
       }
       this.lastPointerPosition.copy(pointerPosition);
+    });
+
+    this.fullscreenButton = this.physics.add.sprite(
+      getGameWidth(this) - 64,
+      getGameHeight(this) - 64,
+      'fullscreen-btn'
+    );
+    this.fullscreenButton.setOrigin(0.5, 0.5);
+    this.fullscreenButton.scale = 0.25;
+    this.fullscreenButton.setInteractive({});
+    this.fullscreenButton.on('pointerup', () => {
+      this.game.scale.toggleFullscreen();
     });
 
     this.leftUI = this.add.image(32, screen_center.y, 'brush1'); // this brush 1 texture is carrying me
