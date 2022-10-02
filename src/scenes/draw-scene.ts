@@ -76,13 +76,11 @@ export class DrawScene extends Phaser.Scene {
     this.palette_color = getRandomColor();
     this.palatte_list = [this.palette_color];
     this.water_color = 0xddeeff;
-    this.selectedBrush = 9;
     this.buttons = [];
     this.dirty = false;
     this.opacity = 1;
     this.music_tracks = [];
     this.musicButtons = [];
-    this.selectedMusic = 0;
     this.pawPieces = [];
 
     // add looping music to the scene
@@ -92,7 +90,6 @@ export class DrawScene extends Phaser.Scene {
     if (!this.started) {
       this.music_tracks[this.selectedMusic].play();
     }
-    this.started = true;
 
     // get the center position of the screen
     const screen_center = new Phaser.Math.Vector2(getGameWidth(this) / 2, getGameHeight(this) / 2);
@@ -442,6 +439,8 @@ export class DrawScene extends Phaser.Scene {
         this.changeBrush(this.selectedBrush - 1);
       }
     });
+
+    this.started = true;
   }
 
   public update(): void {
