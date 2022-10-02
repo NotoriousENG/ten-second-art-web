@@ -103,6 +103,9 @@ export class BootScene extends Phaser.Scene {
     this.load.image('creditsText', 'assets/sprites/credits_list.png');
     this.load.image('fade', 'assets/sprites/fade.png');
 
+    // fullscreen button
+    this.load.image('fullscreen-btn', 'assets/sprites/fullscreen.png');
+
     for (let i = 0; i < NUM_BRUSHES; i++) {
       this.load.image(`brush${i}`, `assets/sprites/brushes/${i}.png`);
     }
