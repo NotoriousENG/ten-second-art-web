@@ -27,6 +27,20 @@ export class DrawScene extends Phaser.Scene {
   private largeBrush: Phaser.Physics.Arcade.Sprite;
   private largeBrushGlow: Phaser.Physics.Arcade.Sprite;
   private easelGroup: Phaser.Physics.Arcade.Group;
+
+  private frameIt: Phaser.Physics.Arcade.Sprite;
+  private drawMode: Phaser.Physics.Arcade.Sprite;
+  private download: Phaser.Physics.Arcade.Sprite;
+  private credits: Phaser.Physics.Arcade.Sprite;
+
+  private frameItGlow: Phaser.Physics.Arcade.Sprite;
+  private drawModeGlow: Phaser.Physics.Arcade.Sprite;
+  private downloadGlow: Phaser.Physics.Arcade.Sprite;
+  private creditsGlow: Phaser.Physics.Arcade.Sprite;
+
+  private creditsText: Phaser.Physics.Arcade.Sprite;
+  private fade: Phaser.Physics.Arcade.Sprite;
+
   private rt: Phaser.GameObjects.RenderTexture;
   private timer: Phaser.Time.TimerEvent;
   private lastPointerPosition: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0);
@@ -271,6 +285,28 @@ export class DrawScene extends Phaser.Scene {
     }
     this.musicButtons[this.selectedMusic].setTint(0xff0000);
 
+    // create buttons
+    this.frameIt = this.physics.add
+      .sprite(screen_center.x, screen_center.y - 350, 'frameIt')
+      .setOrigin(0.5, 0.5)
+      .setScale(0.25, 0.25);
+    this.frameItGlow = this.physics.add
+      .sprite(screen_center.x, screen_center.y - 350, 'frameItGlow')
+      .setOrigin(0.5, 0.5)
+      .setScale(0.25, 0.25);
+    //this.frameIt.visible = false;
+    this.frameItGlow.visible = false;
+    this.frameIt.on('pointermove', () => {
+      this.frameItGlow.visible = true;
+    });
+    this.frameIt.on('pointerout', () => {
+      this.frameItGlow.visible = false;
+    });
+    this.frameIt.on('pointerdown', () => {
+      // TODO!!!!
+    });
+    this.frameIt.setInteractive({ pixelPerfect: true, useHandCursor: true });
+
     // if we click, draw a dot
     this.input.on('pointerdown', (pointer: Input.Pointer) => {
       const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
@@ -332,11 +368,23 @@ export class DrawScene extends Phaser.Scene {
     this.timer = this.time.addEvent({
       delay: 10000,
       callback: () => {
-        this.colors_used++;
-        const new_color = getRandomColor();
-        this.palette_color = new_color;
-        this.palatte_list.push(new_color);
-        this.splat.setTint(this.palette_color);
+        if (this.colors_used == 1) {
+          this.colors_used++;
+          const new_color = getRandomColor();
+          this.palette_color = new_color;
+          this.palatte_list.push(new_color);
+          this.splat.setTint(this.palette_color);
+        } else {
+          this.splat.visible = false;
+          this.timer = this.time.addEvent({
+            delay: 2000,
+            callback: () => {
+              this.frameIt.visible = true;
+              this.drawing = false;
+            },
+            loop: true,
+          });
+        }
       },
       loop: true,
     });

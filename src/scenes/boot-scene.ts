@@ -89,6 +89,21 @@ export class BootScene extends Phaser.Scene {
     this.load.image('splatGlow', 'assets/sprites/splat_glow.png');
     this.load.image('musicIcon', 'assets/sprites/music-icon.png');
 
+    this.load.image('frameIt', 'assets/sprites/frameit.png');
+    this.load.image('title', 'assets/sprites/title.png');
+    this.load.image('drawMore', 'assets/sprites/drawmore.png');
+    this.load.image('download', 'assets/sprites/download.png');
+    this.load.image('credits', 'assets/sprites/credits.png');
+
+    this.load.image('frameItGlow', 'assets/sprites/frameitGlow.png');
+    this.load.image('titleGlow', 'assets/sprites/titleGlow.png');
+    this.load.image('drawMoreGlow', 'assets/sprites/drawmoreGlow.png');
+    this.load.image('downloadGlow', 'assets/sprites/downloadGlow.png');
+    this.load.image('creditsGlow', 'assets/sprites/creditsGlow.png');
+
+    this.load.image('creditsText', 'assets/sprites/credits_list.png');
+    this.load.image('fade', 'assets/sprites/fade.png');
+
     for (let i = 0; i < NUM_BRUSHES; i++) {
       this.load.image(`brush${i}`, `assets/sprites/brushes/${i}.png`);
     }
