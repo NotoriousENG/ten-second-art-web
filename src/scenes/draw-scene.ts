@@ -63,6 +63,7 @@ export class DrawScene extends Phaser.Scene {
   timer60: Phaser.Time.TimerEvent;
   private started = false;
   fullscreenButton: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  mouseWasReleased: any;
 
   constructor() {
     super(sceneConfig);
@@ -232,6 +233,11 @@ export class DrawScene extends Phaser.Scene {
         ),
       );
 
+      if (this.mouseWasReleased) {
+        this.lastPointerPosition = pointerPosition;
+        return;
+      }
+
       if (pointer.isDown && this.drawing) {
         this.dirty = true;
         // draw a line from the last pointer position to the current pointer position fill in gaps dynamically
@@ -247,7 +253,7 @@ export class DrawScene extends Phaser.Scene {
     this.fullscreenButton = this.physics.add.sprite(
       getGameWidth(this) - 64,
       getGameHeight(this) - 64,
-      'fullscreen-btn'
+      'fullscreen-btn',
     );
     this.fullscreenButton.setOrigin(0.5, 0.5);
     this.fullscreenButton.scale = 0.25;
@@ -460,6 +466,8 @@ export class DrawScene extends Phaser.Scene {
     // set image position to mouse pointer
     this.image.setPosition(this.input.activePointer.x, this.input.activePointer.y);
     //this.image.setPosition(normalizedVelocity.x * this.speed, normalizedVelocity.y * this.speed);
+
+    this.mouseWasReleased = this.input.activePointer.leftButtonReleased() || this.mouseWasReleased;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
