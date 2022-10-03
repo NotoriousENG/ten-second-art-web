@@ -84,12 +84,11 @@ export class DrawScene extends Phaser.Scene {
     this.musicButtons = [];
     this.pawPieces = [];
 
+    this.game.sound.stopAll();
+
     // add looping music to the scene
     for (let i = 0; i < NUM_TRACKS; i++) {
       this.music_tracks.push(this.sound.add(`track${i}`, { loop: true }));
-    }
-    if (!this.started) {
-      this.music_tracks[this.selectedMusic].play();
     }
 
     // get the center position of the screen
@@ -247,7 +246,7 @@ export class DrawScene extends Phaser.Scene {
     this.fullscreenButton = this.physics.add.sprite(
       getGameWidth(this) - 64,
       getGameHeight(this) - 64,
-      'fullscreen-btn'
+      'fullscreen-btn',
     );
     this.fullscreenButton.setOrigin(0.5, 0.5);
     this.fullscreenButton.scale = 0.25;
@@ -307,17 +306,10 @@ export class DrawScene extends Phaser.Scene {
           console.log('music changed to: ' + i);
           this.musicButtons[this.selectedMusic].setTint(0xffffff);
           this.changeMusic(i);
-          // get color calculated based on index and number of tracks
-          const color = Color.HSVToRGB(i / NUM_TRACKS, 1, 1) as Phaser.Types.Display.ColorObject;
-          // convert rgb to number
-          const colorInt = (color.r << 16) | (color.g << 8) | color.b;
-
-          // rgb to integer
-          this.musicButtons[this.selectedMusic].setTint(colorInt);
         }
       });
     }
-    this.musicButtons[this.selectedMusic].setTint(0xff0000);
+    this.changeMusic(this.selectedMusic);
 
     //create buttons
     this.drawMode = this.physics.add
@@ -518,6 +510,13 @@ export class DrawScene extends Phaser.Scene {
     }
     this.selectedMusic = i % NUM_TRACKS;
     this.music_tracks[this.selectedMusic].play();
+    // get color calculated based on index and number of tracks
+    const color = Color.HSVToRGB(i / NUM_TRACKS, 1, 1) as Phaser.Types.Display.ColorObject;
+    // convert rgb to number
+    const colorInt = (color.r << 16) | (color.g << 8) | color.b;
+
+    // rgb to integer
+    this.musicButtons[this.selectedMusic].setTint(colorInt);
   }
 
   private setOpacity(opacity: number) {
