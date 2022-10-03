@@ -28,18 +28,11 @@ export class DrawScene extends Phaser.Scene {
   private largeBrushGlow: Phaser.Physics.Arcade.Sprite;
   private easelGroup: Phaser.Physics.Arcade.Group;
 
-  private frameIt: Phaser.Physics.Arcade.Sprite;
   private drawMode: Phaser.Physics.Arcade.Sprite;
   private download: Phaser.Physics.Arcade.Sprite;
-  private credits: Phaser.Physics.Arcade.Sprite;
 
-  private frameItGlow: Phaser.Physics.Arcade.Sprite;
   private drawModeGlow: Phaser.Physics.Arcade.Sprite;
   private downloadGlow: Phaser.Physics.Arcade.Sprite;
-  private creditsGlow: Phaser.Physics.Arcade.Sprite;
-
-  private creditsText: Phaser.Physics.Arcade.Sprite;
-  private fade: Phaser.Physics.Arcade.Sprite;
 
   private rt: Phaser.GameObjects.RenderTexture;
   private timer: Phaser.Time.TimerEvent;
@@ -61,8 +54,8 @@ export class DrawScene extends Phaser.Scene {
   private selectedMusic = 0;
   private pawPieces: Phaser.Physics.Arcade.Sprite[] = [];
   timer60: Phaser.Time.TimerEvent;
-  private started = false;
   fullscreenButton: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  validPointer: boolean;
 
   constructor() {
     super(sceneConfig);
@@ -222,27 +215,6 @@ export class DrawScene extends Phaser.Scene {
       loop: true,
     });
 
-    this.input.on('pointermove', (pointer: Input.Pointer) => {
-      // convert pointer position to render texture position, accounting for the render texture origin
-      const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
-        new Phaser.Math.Vector2(
-          this.rt.x - this.rt.width * this.rt.originX,
-          this.rt.y - this.rt.height * this.rt.originY,
-        ),
-      );
-
-      if (pointer.isDown && this.drawing) {
-        this.dirty = true;
-        // draw a line from the last pointer position to the current pointer position fill in gaps dynamically
-        getLinePoints(this.lastPointerPosition, pointerPosition, (this.image.width * this.brushScale) / 4).forEach(
-          (point) => {
-            this.rt.draw(this.image, point.x, point.y);
-          },
-        );
-      }
-      this.lastPointerPosition.copy(pointerPosition);
-    });
-
     this.fullscreenButton = this.physics.add.sprite(
       getGameWidth(this) - 64,
       getGameHeight(this) - 64,
@@ -368,55 +340,6 @@ export class DrawScene extends Phaser.Scene {
     }
     this.togglePaw(false);
 
-    // if we click, draw a dot
-    this.input.on('pointerdown', (pointer: Input.Pointer) => {
-      const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
-        new Phaser.Math.Vector2(
-          this.rt.x - this.rt.width * this.rt.originX,
-          this.rt.y - this.rt.height * this.rt.originY,
-        ),
-      );
-      if (pointer.isDown && this.drawing) {
-        this.rt.draw(this.image, pointerPosition.x, pointerPosition.y);
-        this.dirty = true;
-      }
-    });
-
-    // this.drawMode = this.physics.add
-    //   .sprite(screen_center.x, screen_center.y + 350, 'drawMore')
-    //   .setOrigin(0.5, 0.5)
-    //   .setScale(0.25, 0.25);
-    // this.drawModeGlow = this.physics.add
-    //   .sprite(screen_center.x, screen_center.y + 350, 'drawMoreGlow')
-    //   .setOrigin(0.5, 0.5)
-    //   .setScale(0.25, 0.25);
-    // //this.drawMode.visible = false;
-    // this.drawModeGlow.visible = false;
-    // this.drawMode.on('pointermove', () => {
-    //   this.drawModeGlow.visible = true;
-    // });
-    // this.drawMode.on('pointerout', () => {
-    //   this.drawModeGlow.visible = false;
-    // });
-    // this.drawMode.on('pointerdown', () => {
-    //   this.scene.restart();
-    // });
-    // this.drawMode.setInteractive({ pixelPerfect: true, useHandCursor: true });
-
-    // // if we click, draw a dot
-    // this.input.on('pointerdown', (pointer: Input.Pointer) => {
-    //   const pointerPosition = new Phaser.Math.Vector2(pointer.x, pointer.y).subtract(
-    //     new Phaser.Math.Vector2(
-    //       this.rt.x - this.rt.width * this.rt.originX,
-    //       this.rt.y - this.rt.height * this.rt.originY,
-    //     ),
-    //   );
-    //   if (pointer.isDown && this.drawing) {
-    //     this.rt.draw(this.image, pointerPosition.x, pointerPosition.y);
-    //     this.dirty = true;
-    //   }
-    // });
-
     // set image scale when using bracket keys
     this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
       if (event.key === '[') {
@@ -444,14 +367,32 @@ export class DrawScene extends Phaser.Scene {
         this.changeBrush(this.selectedBrush - 1);
       }
     });
-
-    this.started = true;
   }
 
   public update(): void {
     // set image position to mouse pointer
     this.image.setPosition(this.input.activePointer.x, this.input.activePointer.y);
     //this.image.setPosition(normalizedVelocity.x * this.speed, normalizedVelocity.y * this.speed);
+
+    const pointerPosition = new Phaser.Math.Vector2(this.input.activePointer.x, this.input.activePointer.y).subtract(
+      new Phaser.Math.Vector2(
+        this.rt.x - this.rt.width * this.rt.originX,
+        this.rt.y - this.rt.height * this.rt.originY,
+      ),
+    );
+
+    // if we click, draw
+    if (this.input.activePointer.leftButtonDown() && this.drawing) {
+      this.dirty = true;
+      // draw a line from the last pointer position to the current pointer position fill in gaps dynamically
+      getLinePoints(this.lastPointerPosition, pointerPosition, (this.image.width * this.brushScale) / 4).forEach(
+        (point) => {
+          this.rt.draw(this.image, point.x, point.y);
+        },
+      );
+    }
+
+    this.lastPointerPosition.copy(pointerPosition);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
