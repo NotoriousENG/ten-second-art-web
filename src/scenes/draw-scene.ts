@@ -56,6 +56,7 @@ export class DrawScene extends Phaser.Scene {
   timer60: Phaser.Time.TimerEvent;
   fullscreenButton: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   validPointer: boolean;
+  touching: boolean;
 
   constructor() {
     super(sceneConfig);
@@ -382,7 +383,7 @@ export class DrawScene extends Phaser.Scene {
     );
 
     // if we click, draw
-    if (this.input.activePointer.leftButtonDown() && this.drawing) {
+    if (this.input.activePointer.leftButtonDown() && this.drawing && this.touching) {
       this.dirty = true;
       // draw a line from the last pointer position to the current pointer position fill in gaps dynamically
       getLinePoints(this.lastPointerPosition, pointerPosition, (this.image.width * this.brushScale) / 4).forEach(
@@ -390,6 +391,11 @@ export class DrawScene extends Phaser.Scene {
           this.rt.draw(this.image, point.x, point.y);
         },
       );
+    }
+    if (this.input.activePointer.leftButtonReleased()) {
+      this.touching = false;
+    } else if (this.input.activePointer.leftButtonDown()) {
+      this.touching = true;
     }
 
     this.lastPointerPosition.copy(pointerPosition);
