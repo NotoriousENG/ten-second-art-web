@@ -1,7 +1,12 @@
 # Minute Monet
 n Minute Monet, your get to create your very own masterpiece in one minute! Every ten seconds, you will get a new random color. With your trusty cat friend, Tink, you’ll get to sign your artwork too! 
-* Play it on [itch.io](https://notoriouseng.itch.io/minute-monet)
-* Made for [Ludum-dare-51](https://ldjam.com/events/ludum-dare/51/minute-monet)
+* Play it on [itch.io](https://notoriouseng.itch.io/minute-monet) 
+* Made for [Ludum-dare-51](https://ldjam.com/events/ludum-dare/51/minute-monet) -- THIS IS BORKED as of a few hours ago, not sure why?
+
+## Pending Updates 
+### (Held until after LDJAM voting period): 
+#### Any commit after  `ae1527a308f8f1e0afeff46c74f88b16c7a44508`
+* Fix for Touch input drawing unintentional lines
 
 ## Fix `ERR_OSSL_EVP_UNSUPPORTED` for Powershell
 ```ps
